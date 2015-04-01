@@ -1,0 +1,19 @@
+--cpu Cortex-M0
+".\_build\main.o"
+".\_build\spi_master.o"
+".\_build\battery.o"
+".\_build\arm_startup_nrf51.o"
+".\_build\system_nrf51.o"
+".\_build\nrf_delay.o"
+".\_build\simple_uart.o"
+".\_build\nrf_soc.o"
+".\_build\app_error.o"
+".\_build\app_scheduler.o"
+".\_build\app_timer.o"
+".\_build\nrf_assert.o"
+".\_build\app_gpiote_fast_detect.o"
+".\_build\softdevice_handler.o"
+--library_type=microlib --strict --scatter ".\_build\nrf51422_xxac_s120.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\_build\nrf51422_xxac_s120.map" -o .\_build\nrf51422_xxac_s120.axf

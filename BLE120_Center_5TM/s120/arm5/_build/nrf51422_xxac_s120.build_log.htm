@@ -1,0 +1,191 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\ble_app_hrs_c_s120_pca10028.uvprojx
+Project File Date:  02/11/2015
+
+<h2>Output:</h2>
+Build target 'nrf51422_xxac_s120'
+compiling main.c...
+..\..\..\main.c(116): warning:  #186-D: pointless comparison of unsigned integer with zero
+      if((bHex>=0)&&(bHex<=9))
+..\..\..\main.c(295): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+                nrf_delay_ms(1);
+..\..\..\main.c(364): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+                nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
+..\..\..\main.c(365): warning:  #188-D: enumerated type mixed with another type
+                spi_base_address=spi_master_init(0, 0, 0);
+..\..\..\main.c(365): warning:  #188-D: enumerated type mixed with another type
+                spi_base_address=spi_master_init(0, 0, 0);
+..\..\..\main.c(38): warning:  #177-D: variable "spi_flash_pages_count" was declared but never referenced
+  static uint16_t spi_flash_pages_count=0;
+..\..\..\main.c(39): warning:  #550-D: variable "timer_counter" was set but never used
+  static uint32_t timer_counter=0;
+..\..\..\main.c: 7 warnings, 0 errors
+compiling spi_master.c...
+compiling battery.c...
+..\..\..\battery.c(65): warning:  #177-D: variable "percentage_batt_lvl" was declared but never referenced
+          uint8_t     percentage_batt_lvl;
+..\..\..\battery.c(66): warning:  #177-D: variable "err_code" was declared but never referenced
+          uint32_t    err_code;
+..\..\..\battery.c(95): warning:  #177-D: variable "err_code" was declared but never referenced
+      uint32_t err_code=0;
+..\..\..\battery.c: 3 warnings, 0 errors
+assembling arm_startup_nrf51.s...
+compiling system_nrf51.c...
+compiling nrf_delay.c...
+compiling simple_uart.c...
+compiling nrf_soc.c...
+compiling app_error.c...
+compiling app_scheduler.c...
+compiling app_timer.c...
+compiling nrf_assert.c...
+compiling app_gpiote_fast_detect.c...
+compiling softdevice_handler.c...
+linking...
+Program Size: Code=8116 RO-data=224 RW-data=132 ZI-data=3772  
+FromELF: creating hex file...
+".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 10 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.3.20.4.pack
+                ARM::CMSIS:CORE:3.20.0
+                Cortex Microcontroller Software Interface Standard (CMSIS) CORE, DSP, RTOS, Driver
+   * Component: CORE Version: 3.20.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_DeviceFamilyPack/NordicSemiconductor.nRF_DeviceFamilyPack.1.1.4.pack
+                NordicSemiconductor::Device:Startup:1.0.1
+                Nordic Semiconductor nRF ARM devices Device Family Pack.
+   * Component: Startup Version: 1.0.1
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/NordicSemiconductor.nRF_Drivers.1.2.0.pack
+                NordicSemiconductor::nRF_Drivers:nrf_gpio:1.2.0
+                Drivers for Nordic Semiconductor nRF family.
+   * Component: nrf_gpio Version: 1.2.0
+   * Component: nrf_delay Version: 1.2.0
+   * Component: nrf_error Variant: default Version: 1.2.0
+   * Component: simple_uart Version: 1.2.0
+   * Component: nrf_soc Variant: No_softdevice Version: 1.2.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/NordicSemiconductor.nRF_Libraries.1.1.0.pack
+                NordicSemiconductor::nRF_Libraries:app_error:1.1.0
+                Software modules for Nordic Semiconductor nRF family.
+   * Component: app_error Version: 1.1.0
+   * Component: app_gpiote Variant: Fast_detect Version: 1.1.0
+   * Component: app_scheduler Variant: default Version: 1.1.0
+   * Component: app_timer Variant: default Version: 1.1.0
+   * Component: app_util Variant: default Version: 1.1.0
+   * Component: nrf_assert Version: 1.1.0
+   * Component: app_trace Variant: Dummy Version: 1.1.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_Common/NordicSemiconductor.nRF_SoftDevice_Common.1.1.0.pack
+                NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.0
+                Common components for Nordic Semiconductor nRF family SoftDevices.
+   * Component: sd_common Variant: default Version: 1.1.0
+   * Component: softdevice_present Version: 1.1.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_S120/NordicSemiconductor.nRF_SoftDevice_S120.1.0.1-3.pack
+                NordicSemiconductor::nRF_SoftDevice:s120:default:1.0.1-3
+                Components for Bluetooth Low Energy (Bluetooth Smart) S120 SoftDevice for Nordic Semiconductor nRF family.
+   * Component: s120 Variant: default Version: 1.0.1-3
+
+<h2>Collection of Component include folders:</h2>
+  C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE
+  C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA
+  C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\nrf_soc_nosd
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\simple_uart
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\gpiote
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\scheduler
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\timer
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\trace
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_Common\1.1.0\softdevice_handler
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:3.20.0
+
+   * Component: NordicSemiconductor::Device:Startup:1.0.1
+      Source file:   Device\Source\arm\arm_startup_nrf51.s
+      Source file:   Device\Source\system_nrf51.c
+      Include file:  Device\Include\system_nrf51.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_gpio:1.2.0
+      Include file:  hal\nrf_gpio.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_delay:1.2.0
+      Source file:   hal\nrf_delay.c
+      Include file:  hal\nrf_delay.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_error:default:1.2.0
+
+   * Component: NordicSemiconductor::nRF_Drivers:simple_uart:1.2.0
+      Source file:   simple_uart\simple_uart.c
+      Include file:  simple_uart\simple_uart.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_soc:No_softdevice:1.2.0
+      Source file:   nrf_soc_nosd\nrf_soc.c
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_error:1.1.0
+      Include file:  util\app_error.h
+      Source file:   util\app_error.c
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_gpiote:Fast_detect:1.1.0
+      Include file:  gpiote\app_gpiote.h
+      Source file:   gpiote\app_gpiote_fast_detect.c
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_scheduler:default:1.1.0
+      Include file:  scheduler\app_scheduler.h
+      Source file:   scheduler\app_scheduler.c
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_timer:default:1.1.0
+      Include file:  timer\app_timer.h
+      Source file:   timer\app_timer.c
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_util:default:1.1.0
+
+   * Component: NordicSemiconductor::nRF_Libraries:nrf_assert:1.1.0
+      Source file:   util\nrf_assert.c
+      Include file:  util\nrf_assert.h
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_trace:Dummy:1.1.0
+      Include file:  trace\app_trace.h
+
+   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.0
+      Source file:   softdevice_handler\softdevice_handler.c
+
+   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:softdevice_present:1.1.0
+
+   * Component: NordicSemiconductor::nRF_SoftDevice:s120:default:1.0.1-3
+      Include file:  headers\nrf_error_soc.h
+      Include file:  headers\ble_l2cap.h
+      Include file:  headers\nrf_soc.h
+      Include file:  headers\ble_gatts.h
+      Include file:  headers\ble_err.h
+      Include file:  headers\nrf_svc.h
+      Include file:  headers\ble_gattc.h
+      Include file:  headers\ble_gap.h
+      Include file:  headers\ble.h
+      Include file:  headers\nrf_mbr.h
+      Include file:  headers\softdevice_assert.h
+      Include file:  headers\ble_gatt.h
+      Include file:  headers\nrf_error_sdm.h
+      Include file:  headers\ble_hci.h
+      Include file:  headers\nrf_error.h
+      Include file:  headers\nrf_sdm.h
+      Include file:  headers\ble_types.h
+      Include file:  headers\ble_ranges.h

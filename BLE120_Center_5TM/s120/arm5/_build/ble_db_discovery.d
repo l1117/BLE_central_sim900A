@@ -1,0 +1,14 @@
+.\_build\ble_db_discovery.o: RTE\nRF_BLE\nRF51822_xxAA\ble_db_discovery.c
+.\_build\ble_db_discovery.o: RTE\nRF_BLE\nRF51822_xxAA\ble_db_discovery.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_gattc.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_gatt.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_types.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_ranges.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_svc.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_gap.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_l2cap.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_err.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error.h
+.\_build\ble_db_discovery.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\ble_gatts.h
