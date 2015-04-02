@@ -27,10 +27,10 @@ static ble_gap_scan_params_t        m_scan_param;                        /**< Sc
 static app_timer_id_t           weakup_timer_id;                                   
 static app_timer_id_t  					weakup_meantimer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
-#define MAX_rx_count 522
-#define LEN_record 37
+#define MAX_rx_count 1024       //522
+#define LEN_record 40
 #define GTM900_power_pin 4
-
+#define TIME_PERIOD 20       //seconds
 static uint8_t tx_data[MAX_rx_count]; /**< SPI TX buffer. */
 static uint8_t rx_data[MAX_rx_count]; /**< SPI RX buffer. */
 static uint32_t *spi_base_address;
@@ -128,10 +128,10 @@ void gprs_gtm900()
 			send_string("AT\r\n","OK");
 			send_string("ATE0\r\n","OK");
 			if(!send_string("AT+CPIN?\r\n","READY")) return; //error
-			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
-//			if (send_string("","DST:")||send_string("","DST:"))	send_string("AT+CCLK?\r\n","OK");
-			(send_string("","DST:")||send_string("","DST:"));  //wait for time stamp almost 2 timrs 10 Secs.
-			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
+//////			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
+////////			if (send_string("","DST:")||send_string("","DST:"))	send_string("AT+CCLK?\r\n","OK");
+//////			(send_string("","DST:")||send_string("","DST:"));  //wait for time stamp almost 2 timrs 10 Secs.
+//////			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
 //			send_string("AT%SLEEP=0\r\n","OK");
 //			send_string("AT+CGREG=1\r\n"); 
 //connect smtp server
@@ -204,7 +204,7 @@ void gprs_gtm900()
 //send data area
 			send_string("AT+CIPSEND\r\n",">");
 
-			for (uint16_t i=4;i<MAX_rx_count;){
+			for (uint16_t i=4;i<(MAX_rx_count);){
 					simple_uart_put(char_hex(tx_data[i]>>4));
 					simple_uart_put(char_hex(tx_data[i]));
 					i++;
@@ -233,7 +233,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     {
         case BLE_GAP_EVT_ADV_REPORT:
         {
-				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[5])==0x59)
+				if (p_ble_evt->evt.gap_evt.params.adv_report.data[5] == 0x81 )
 					{
 						for (uint8_t i=6;i>0;i--){ 						
 //							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
@@ -244,6 +244,8 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 							tx_data[rx_count++]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
 //							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
 							}
+						 *((uint32_t*)(tx_data+rx_count-1)) = timer_counter;
+							rx_count+=3;
 //						simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.rssi);
 						}
 					}
@@ -277,9 +279,10 @@ static void weakup_timeout_handler(void * p_context)
 		m_scan_param.timeout      = 0x0000;       // No timeout.
     uint32_t err_code = sd_ble_gap_scan_start(&m_scan_param);
     APP_ERROR_CHECK(err_code);
+		timer_counter += TIME_PERIOD ;
     app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
-		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-		simple_uart_config(NULL, 8, NULL, 9, false);
+//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+//		simple_uart_config(NULL, 8, NULL, 9, false);
 		
 //		if (rx_count>(MAX_rx_count-24)) rx_count=4;  //leave for tx command codes;
 
@@ -310,18 +313,23 @@ static void weakup_meantimeout_handler(void * p_context)
 				nrf_delay_ms(100);
 				nrf_gpio_pin_set(GTM900_power_pin);
 
+				NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+				simple_uart_config(NULL, 8, NULL, 9, false);
+
 				gprs_gtm900();
 				send_string("AT+CIPSHUT\r\n","OK");
 				send_string("AT+CGATT=0\r\n","OK");
 				send_string("AT+CPOWD=1\r\n","POWER");
 //				send_string("AT%MSO\r\n","Shut down");
-
-
+				nrf_gpio_pin_set(GTM900_power_pin);
+				nrf_delay_ms(100);
 				nrf_gpio_pin_clear(GTM900_power_pin);
 				memset(tx_data,0,MAX_rx_count);
+				NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+
 			}
 
-		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+//		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 
 
 }
@@ -329,6 +337,13 @@ static void weakup_meantimeout_handler(void * p_context)
 int main(void)
 {
 	uint32_t err_code;
+	NRF_GPIO->PIN_CNF[GTM900_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
+                                            | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
+                                            | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
+                                            | (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
+                                            | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+
+	nrf_gpio_pin_set(GTM900_power_pin);
 	simple_uart_config(NULL, 8, NULL, 9, false);
 			send_string("AT\r\n","OK");
 			send_string("AT\r\n","OK");
@@ -352,11 +367,6 @@ int main(void)
 
 //	while(!send_string("0D0A0D0A\"\r\n","OK"));
 //GMT900 POWER on off control
-	NRF_GPIO->PIN_CNF[GTM900_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                            | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                            | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                            | (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
-                                            | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
 	nrf_gpio_pin_clear(GTM900_power_pin);
 
 
@@ -383,7 +393,7 @@ int main(void)
 																	weakup_meantimeout_handler);
 
 			 APP_ERROR_CHECK(err_code);
-			 app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(10000, 0), NULL);
+			 app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL);
 //evt_wait
 			for (;;)
 			{

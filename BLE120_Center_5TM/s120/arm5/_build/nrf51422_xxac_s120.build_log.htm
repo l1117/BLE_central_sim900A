@@ -11,43 +11,21 @@ Build target 'nrf51422_xxac_s120'
 compiling main.c...
 ..\..\..\main.c(116): warning:  #186-D: pointless comparison of unsigned integer with zero
       if((bHex>=0)&&(bHex<=9))
-..\..\..\main.c(295): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+..\..\..\main.c(298): warning:  #223-D: function "nrf_delay_ms" declared implicitly
                 nrf_delay_ms(1);
-..\..\..\main.c(364): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+..\..\..\main.c(374): warning:  #223-D: function "nrf_delay_ms" declared implicitly
                 nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-..\..\..\main.c(365): warning:  #188-D: enumerated type mixed with another type
+..\..\..\main.c(375): warning:  #188-D: enumerated type mixed with another type
                 spi_base_address=spi_master_init(0, 0, 0);
-..\..\..\main.c(365): warning:  #188-D: enumerated type mixed with another type
+..\..\..\main.c(375): warning:  #188-D: enumerated type mixed with another type
                 spi_base_address=spi_master_init(0, 0, 0);
 ..\..\..\main.c(38): warning:  #177-D: variable "spi_flash_pages_count" was declared but never referenced
   static uint16_t spi_flash_pages_count=0;
-..\..\..\main.c(39): warning:  #550-D: variable "timer_counter" was set but never used
-  static uint32_t timer_counter=0;
-..\..\..\main.c: 7 warnings, 0 errors
-compiling spi_master.c...
-compiling battery.c...
-..\..\..\battery.c(65): warning:  #177-D: variable "percentage_batt_lvl" was declared but never referenced
-          uint8_t     percentage_batt_lvl;
-..\..\..\battery.c(66): warning:  #177-D: variable "err_code" was declared but never referenced
-          uint32_t    err_code;
-..\..\..\battery.c(95): warning:  #177-D: variable "err_code" was declared but never referenced
-      uint32_t err_code=0;
-..\..\..\battery.c: 3 warnings, 0 errors
-assembling arm_startup_nrf51.s...
-compiling system_nrf51.c...
-compiling nrf_delay.c...
-compiling simple_uart.c...
-compiling nrf_soc.c...
-compiling app_error.c...
-compiling app_scheduler.c...
-compiling app_timer.c...
-compiling nrf_assert.c...
-compiling app_gpiote_fast_detect.c...
-compiling softdevice_handler.c...
+..\..\..\main.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=8116 RO-data=224 RW-data=132 ZI-data=3772  
+Program Size: Code=8108 RO-data=224 RW-data=132 ZI-data=4780  
 FromELF: creating hex file...
-".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 10 Warning(s).
+".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -72,6 +50,12 @@ Package Vendor: NordicSemiconductor
    * Component: nrf_error Variant: default Version: 1.2.0
    * Component: simple_uart Version: 1.2.0
    * Component: nrf_soc Variant: No_softdevice Version: 1.2.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Examples/NordicSemiconductor.nRF_Examples.7.1.0.pack
+                NordicSemiconductor::Board Support:bsp:Defines:7.1.0
+                Examples and BSP for Nordic Semiconductor nRF family.
+   * Component: bsp Variant: Defines Version: 7.1.0
 
 Package Vendor: NordicSemiconductor
                 http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/NordicSemiconductor.nRF_Libraries.1.1.0.pack
@@ -107,6 +91,7 @@ Package Vendor: NordicSemiconductor
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\nrf_soc_nosd
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\simple_uart
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Examples\7.1.0\bsp
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\gpiote
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\scheduler
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\timer
@@ -139,6 +124,8 @@ Package Vendor: NordicSemiconductor
 
    * Component: NordicSemiconductor::nRF_Drivers:nrf_soc:No_softdevice:1.2.0
       Source file:   nrf_soc_nosd\nrf_soc.c
+
+   * Component: NordicSemiconductor::Board Support:bsp:Defines:7.1.0
 
    * Component: NordicSemiconductor::nRF_Libraries:app_error:1.1.0
       Include file:  util\app_error.h
@@ -189,3 +176,51 @@ Package Vendor: NordicSemiconductor
       Include file:  headers\nrf_sdm.h
       Include file:  headers\ble_types.h
       Include file:  headers\ble_ranges.h
+Load "C:\\Users\\Yelun\\Documents\\GitHub\\BLE_central_sim900A\\BLE120_Center_5TM\\s120\\arm5\\_build\\nrf51422_xxac_s120.axf" 
+Set JLink Project File to "C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\JLinkSettings.ini"
+* JLink Info: Device "NRF51822_XXAA" selected (257 KB flash, 16 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.92 , compiled Sep 30 2014 09:33:42
+Firmware: J-Link ARM V8 compiled Sep 22 2014 23:26:43
+Hardware: V8.00
+S/N : 286370559 
+Feature(s) : RDI,FlashDL,FlashBP,JFlash 
+ 
+* JLink Info: Found SWD-DP with ID 0x0BB11477
+* JLink Info: Found Cortex-M0 r0p0, Little endian.
+* JLink Info: FPUnit: 4 code (BP) slots and 0 literal slots
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: nRF51822_xxAA
+VTarget = 4.037V
+State of Pins: 
+TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
+Hardware-Breakpoints: 4
+Software-Breakpoints: 8192
+Watchpoints:          2
+JTAG speed: 4000 kHz
+ 
+Erase Done.
+Programming Done.
+Verify OK.
+Application running ...
+</pre>
+</body>
+</html>
+F51822_xxAA
+VTarget = 4.037V
+State of Pins: 
+TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
+Hardware-Breakpoints: 4
+Software-Breakpoints: 8192
+Watchpoints:          2
+JTAG speed: 4000 kHz
+ 
+Erase Done.
+Programming Done.
+Verify OK.
+Application running ...

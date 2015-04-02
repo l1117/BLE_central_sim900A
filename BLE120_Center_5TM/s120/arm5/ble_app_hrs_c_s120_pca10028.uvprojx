@@ -437,6 +437,9 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>::Board Support</GroupName>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -558,6 +561,12 @@
     <components>
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="3.20.0" condition="CMSIS Core">
         <package name="CMSIS" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="ARM" version="3.20.4"/>
+        <targetInfos>
+          <targetInfo name="nrf51422_xxac_s120"/>
+        </targetInfos>
+      </component>
+      <component Cclass="Board Support" Cgroup="bsp" Cvariant="Defines" Cvendor="NordicSemiconductor" Cversion="7.1.0" condition="bsp_Defines">
+        <package name="nRF_Examples" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Examples/" vendor="NordicSemiconductor" version="7.1.0"/>
         <targetInfos>
           <targetInfo name="nrf51422_xxac_s120"/>
         </targetInfos>
