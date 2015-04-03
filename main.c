@@ -27,17 +27,17 @@ static ble_gap_scan_params_t        m_scan_param;                        /**< Sc
 static app_timer_id_t           weakup_timer_id;                                   
 static app_timer_id_t  					weakup_meantimer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
-#define MAX_rx_count 522
-#define LEN_record 40
+#define MAX_rx_count 2048
+#define LEN_record 32
 #define GTM900_power_pin 4
 #define TIME_PERIOD 20       //seconds
 static uint8_t tx_data[MAX_rx_count]; /**< SPI TX buffer. */
-static uint8_t rx_data[MAX_rx_count]; /**< SPI RX buffer. */
+static uint8_t rx_data[256]; /**< Receive data buffer. */
 static uint32_t *spi_base_address;
 static uint16_t spi_flash_pages=0;
 static uint16_t spi_flash_pages_count=0;
 static uint32_t timer_counter=0;
-static uint16_t rx_count=4;
+static uint16_t rx_count=0;
 static uint16_t month_days[12]={0,31,31+28,31+28+31,31+28+31+30,31+28+31+30+31,
 										31+28+31+30+31+30,31+28+31+30+31+30+31,31+28+31+30+31+30+31+31,
 										31+28+31+30+31+30+31+31+30,31+28+31+30+31+30+31+31+30+31,
@@ -203,13 +203,16 @@ void gprs_gtm900()
 //send data area
 			send_string("AT+CIPSEND\r\n",">");
 
-			for (uint16_t i=4;i<(MAX_rx_count);){
+			for (uint16_t i=0;i<(MAX_rx_count);){
 					simple_uart_put(char_hex(tx_data[i]>>4));
 					simple_uart_put(char_hex(tx_data[i]));
 					i++;
-					if (!((i-4)%LEN_record)){
-									if (!send_string("\r\n\x1a","OK")) return;
-									send_string("AT+CIPSEND\r\n",">");
+					if (!(i%LEN_record)){
+//									if (!send_string("\r\n\x1a","OK")) return;
+//									send_string("AT+CIPSEND\r\n",">");
+					simple_uart_put('\r');
+					simple_uart_put('\n');
+
 					}
 			}
 			send_string("\r\n\x1a","OK");
@@ -238,13 +241,13 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 //							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
 							tx_data[rx_count++]=p_gap_evt->params.adv_report.peer_addr.addr[i-1];
 							}
-						for (uint8_t i=0;i<BLE_GAP_ADV_MAX_SIZE;i++)
+						for (uint8_t i=5;i<27;i++)     //27 is ADV data length
 							{	
 							tx_data[rx_count++]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
 //							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
 							}
-						 *((uint32_t*)(tx_data+rx_count-1)) = timer_counter;
-							rx_count+=3;
+						 *((uint32_t*)(tx_data+rx_count)) = timer_counter;
+							rx_count+=4;
 //						simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.rssi);
 						}
 					}
@@ -292,22 +295,22 @@ static void weakup_meantimeout_handler(void * p_context)
     UNUSED_PARAMETER(p_context);
     uint32_t err_code = sd_ble_gap_scan_stop();
     APP_ERROR_CHECK(err_code);
-//AT45DB Flash writen
-    tx_data[0]=0xAB;			//Resume from sleep
-    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)tx_data, rx_data);
-		nrf_delay_ms(1);
+////AT45DB Flash writen
+//    tx_data[0]=0xAB;			//Resume from sleep
+//    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)tx_data, rx_data);
+//		nrf_delay_ms(1);
 
-	  tx_data[0]=0x82;tx_data[1]=(spi_flash_pages>>6);tx_data[2]=(spi_flash_pages<<2);tx_data[3]=0;
-    spi_master_tx_rx(spi_base_address, 256, (const uint8_t *)tx_data, rx_data);
-		nrf_delay_ms(20);  //waiting for flash over.
+//	  tx_data[0]=0x82;tx_data[1]=(spi_flash_pages>>6);tx_data[2]=(spi_flash_pages<<2);tx_data[3]=0;
+//    spi_master_tx_rx(spi_base_address, 256, (const uint8_t *)tx_data, rx_data);
+//		nrf_delay_ms(20);  //waiting for flash over.
 
-    tx_data[0]=0xB9;				//power down sleep
-    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)tx_data, rx_data);
+//    tx_data[0]=0xB9;				//power down sleep
+//    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)tx_data, rx_data);
 
-		spi_flash_pages++;
+//		spi_flash_pages++;
 
 		if (rx_count>(MAX_rx_count - 4*LEN_record )) {
-				rx_count=4;
+				rx_count=0;
 //				battery_start();		
 				nrf_gpio_pin_clear(GTM900_power_pin);
 				nrf_delay_ms(100);
@@ -344,6 +347,14 @@ int main(void)
                                             | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
 
 	nrf_gpio_pin_set(GTM900_power_pin);
+
+
+//AT45DB161 sleep down
+	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
+		spi_base_address=spi_master_init(0, 0, 0);
+		uint8_t spi_data[1]={0XB9};
+    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)spi_data, spi_data);
+
 	simple_uart_config(NULL, 8, NULL, 9, false);
 			send_string("AT\r\n","OK");
 			send_string("AT\r\n","OK");
@@ -369,12 +380,6 @@ int main(void)
 //GMT900 POWER on off control
 	nrf_gpio_pin_clear(GTM900_power_pin);
 
-
-//AT45DB161 sleep down
-	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-		spi_base_address=spi_master_init(0, 0, 0);
-		tx_data[0]=0XB9;
-    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)tx_data, rx_data);
 
 //			simple_uart_config(NULL, 8, NULL, 9, false);
 //softdevice enable
