@@ -4,13 +4,11 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\ble_app_hrs_c_s120_pca10028.uvprojx
-Project File Date:  02/11/2015
+Project File Date:  04/01/2015
 
 <h2>Output:</h2>
 Build target 'nrf51422_xxac_s120'
 compiling main.c...
-..\..\..\main.c(116): warning:  #186-D: pointless comparison of unsigned integer with zero
-      if((bHex>=0)&&(bHex<=9))
 ..\..\..\main.c(298): warning:  #223-D: function "nrf_delay_ms" declared implicitly
                 nrf_delay_ms(1);
 ..\..\..\main.c(374): warning:  #223-D: function "nrf_delay_ms" declared implicitly
@@ -21,11 +19,11 @@ compiling main.c...
                 spi_base_address=spi_master_init(0, 0, 0);
 ..\..\..\main.c(38): warning:  #177-D: variable "spi_flash_pages_count" was declared but never referenced
   static uint16_t spi_flash_pages_count=0;
-..\..\..\main.c: 6 warnings, 0 errors
+..\..\..\main.c: 5 warnings, 0 errors
 linking...
-Program Size: Code=8108 RO-data=224 RW-data=132 ZI-data=4780  
+Program Size: Code=8104 RO-data=224 RW-data=132 ZI-data=3772  
 FromELF: creating hex file...
-".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 6 Warning(s).
+".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 5 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -196,7 +194,7 @@ ROMTableAddr = 0xE00FF003
 Target info:
 ------------
 Device: nRF51822_xxAA
-VTarget = 4.037V
+VTarget = 3.998V
 State of Pins: 
 TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
 Hardware-Breakpoints: 4
@@ -208,11 +206,31 @@ Erase Done.
 Programming Done.
 Verify OK.
 Application running ...
-</pre>
-</body>
-</html>
-F51822_xxAA
-VTarget = 4.037V
+Error: Target DLL has been cancelled. Debugger aborted !
+se Done.
+Programming Done.
+Verify OK.
+Application running ...
+gs.ini"
+* JLink Info: Device "NRF51822_XXAA" selected (257 KB flash, 16 KB RAM).
+ 
+JLink info:
+------------
+DLL: V4.92 , compiled Sep 30 2014 09:33:42
+Firmware: J-Link ARM V8 compiled Sep 22 2014 23:26:43
+Hardware: V8.00
+S/N : 286370559 
+Feature(s) : RDI,FlashDL,FlashBP,JFlash 
+ 
+* JLink Info: Found SWD-DP with ID 0x0BB11477
+* JLink Info: Found Cortex-M0 r0p0, Little endian.
+* JLink Info: FPUnit: 4 code (BP) slots and 0 literal slots
+ROMTableAddr = 0xE00FF003
+ 
+Target info:
+------------
+Device: nRF51822_xxAA
+VTarget = 4.018V
 State of Pins: 
 TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
 Hardware-Breakpoints: 4

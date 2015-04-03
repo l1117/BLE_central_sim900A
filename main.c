@@ -27,7 +27,7 @@ static ble_gap_scan_params_t        m_scan_param;                        /**< Sc
 static app_timer_id_t           weakup_timer_id;                                   
 static app_timer_id_t  					weakup_meantimer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
-#define MAX_rx_count 1024       //522
+#define MAX_rx_count 522
 #define LEN_record 40
 #define GTM900_power_pin 4
 #define TIME_PERIOD 20       //seconds
@@ -113,11 +113,10 @@ bool send_string(char * S,char * Respond)
 
  char char_hex( char bHex){
 		bHex&=0x0f;
-    if((bHex>=0)&&(bHex<=9))
-        bHex += 0x30;
-    else if((bHex>=10)&&(bHex<=15))//????
-        bHex += 0x37;
-    else bHex = 0xff;
+    if((bHex<10))
+        bHex += '0';
+    else bHex += 'A'-10;
+//    else bHex = 0xff;
     return bHex;
 }
 void gprs_gtm900()
@@ -233,7 +232,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     {
         case BLE_GAP_EVT_ADV_REPORT:
         {
-				if (p_ble_evt->evt.gap_evt.params.adv_report.data[5] == 0x81 )
+				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[5] == 0x81 ) && (rx_count+LEN_record)<MAX_rx_count)
 					{
 						for (uint8_t i=6;i>0;i--){ 						
 //							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
@@ -277,6 +276,7 @@ static void weakup_timeout_handler(void * p_context)
 		m_scan_param.window       = 0x109E;   // Scan window.
 		m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
 		m_scan_param.timeout      = 0x0000;       // No timeout.
+		sd_ble_gap_scan_stop();
     uint32_t err_code = sd_ble_gap_scan_start(&m_scan_param);
     APP_ERROR_CHECK(err_code);
 		timer_counter += TIME_PERIOD ;
@@ -320,9 +320,9 @@ static void weakup_meantimeout_handler(void * p_context)
 				send_string("AT+CIPSHUT\r\n","OK");
 				send_string("AT+CGATT=0\r\n","OK");
 				send_string("AT+CPOWD=1\r\n","POWER");
-//				send_string("AT%MSO\r\n","Shut down");
-				nrf_gpio_pin_set(GTM900_power_pin);
-				nrf_delay_ms(100);
+////				send_string("AT%MSO\r\n","Shut down");
+//				nrf_gpio_pin_set(GTM900_power_pin);
+//				nrf_delay_ms(100);
 				nrf_gpio_pin_clear(GTM900_power_pin);
 				memset(tx_data,0,MAX_rx_count);
 				NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
