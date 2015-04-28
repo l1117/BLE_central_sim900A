@@ -13,12 +13,14 @@
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\nrf51_deprecated.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\compiler_abstraction.h
 .\_build\app_gpiote_fast_detect.o: RTE\nRF_Libraries\nRF51822_xxAA\app_error.h
-.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\nrf_soc_nosd\nrf_error.h
+.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util\app_util.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdlib.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\string.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util\app_util_platform.h
-.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\nrf_soc_nosd\nrf_soc.h
+.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_soc.h
+.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_svc.h
+.\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error_soc.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util\app_error.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal\nrf_gpio.h
 .\_build\app_gpiote_fast_detect.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal\nrf51.h

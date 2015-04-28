@@ -1,12 +1,12 @@
-.\_build\pstorage.o: RTE\nRF_Drivers\nRF51422_xxAC\pstorage.c
-.\_build\pstorage.o: RTE\nRF_Drivers\nRF51422_xxAC\pstorage.h
-.\_build\pstorage.o: RTE\nRF_Drivers\nRF51422_xxAC\pstorage_platform.h
+.\_build\pstorage.o: RTE\nRF_Drivers\nRF51822_xxAA\pstorage.c
+.\_build\pstorage.o: RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h
+.\_build\pstorage.o: RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdlib.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\string.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util\nordic_common.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error.h
-.\_build\pstorage.o: C:\Users\Yelun\Desktop\ble_central\ble_app_hrs_c\pca10028\s120\arm5\RTE\nRF_Libraries\nRF51422_xxAC\nrf_assert.h
+.\_build\pstorage.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\nrf_assert.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\compiler_abstraction.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\nrf.h
 .\_build\pstorage.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\nrf51.h

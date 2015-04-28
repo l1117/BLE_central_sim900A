@@ -20,7 +20,6 @@
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers\nrf_error_sdm.h
 .\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_error.h
-.\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\nrf_soc_nosd\nrf_error.h
 .\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_scheduler.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util\app_util.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include\compiler_abstraction.h
@@ -38,6 +37,8 @@
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal\nrf_gpio.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal\nrf51.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal\nrf51_bitfields.h
+.\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h
+.\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h
 .\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_trace.h
 .\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA\simple_uart.h
 .\_build\main.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_timer.h

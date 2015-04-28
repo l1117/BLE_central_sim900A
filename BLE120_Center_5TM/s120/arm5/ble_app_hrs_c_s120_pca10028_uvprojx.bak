@@ -355,10 +355,10 @@
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>--c99</MiscControls>
+              <MiscControls></MiscControls>
               <Define>BLE_STACK_SUPPORT_REQD S120 SOFTDEVICE_PRESENT</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\config</IncludePath>
@@ -437,6 +437,9 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>::Board Support</GroupName>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -473,9 +476,19 @@
               <FilePath>RTE\nRF_Drivers\nRF51822_xxAA\simple_uart.h</FilePath>
             </File>
             <File>
-              <FileName>nrf_soc.c</FileName>
+              <FileName>pstorage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>RTE\nRF_Drivers\nRF51822_xxAA\nrf_soc.c</FilePath>
+              <FilePath>RTE\nRF_Drivers\nRF51822_xxAA\pstorage.c</FilePath>
+            </File>
+            <File>
+              <FileName>pstorage.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h</FilePath>
+            </File>
+            <File>
+              <FileName>pstorage_platform.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -562,6 +575,12 @@
           <targetInfo name="nrf51422_xxac_s120"/>
         </targetInfos>
       </component>
+      <component Cclass="Board Support" Cgroup="bsp" Cvariant="Defines" Cvendor="NordicSemiconductor" Cversion="7.1.0" condition="bsp_Defines">
+        <package name="nRF_Examples" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Examples/" vendor="NordicSemiconductor" version="7.1.0"/>
+        <targetInfos>
+          <targetInfo name="nrf51422_xxac_s120"/>
+        </targetInfos>
+      </component>
       <component Cclass="Device" Cgroup="Startup" Cvendor="NordicSemiconductor" Cversion="1.0.1" condition="nRF51 Series CMSIS Device">
         <package name="nRF_DeviceFamilyPack" schemaVersion="1.0" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_DeviceFamilyPack/" vendor="NordicSemiconductor" version="1.1.4"/>
         <targetInfos>
@@ -586,7 +605,7 @@
           <targetInfo name="nrf51422_xxac_s120"/>
         </targetInfos>
       </component>
-      <component Cclass="nRF_Drivers" Cgroup="nrf_soc" Cvariant="No_softdevice" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="nrf_soc_No_softdevice">
+      <component Cclass="nRF_Drivers" Cgroup="pstorage" Cvariant="default" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="pstorage">
         <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
         <targetInfos>
           <targetInfo name="nrf51422_xxac_s120"/>
@@ -759,8 +778,30 @@
         <targetInfos/>
       </file>
       <file attr="config" category="source" name="nrf_soc_nosd\nrf_soc.c">
-        <instance index="0">RTE\nRF_Drivers\nRF51822_xxAA\nrf_soc.c</instance>
+        <instance index="0" removed="1">RTE\nRF_Drivers\nRF51822_xxAA\nrf_soc.c</instance>
         <component Cclass="nRF_Drivers" Cgroup="nrf_soc" Cvariant="No_softdevice" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="nrf_soc_No_softdevice"/>
+        <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" name="pstorage\pstorage.c">
+        <instance index="0">RTE\nRF_Drivers\nRF51822_xxAA\pstorage.c</instance>
+        <component Cclass="nRF_Drivers" Cgroup="pstorage" Cvariant="default" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="pstorage"/>
+        <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
+        <targetInfos>
+          <targetInfo name="nrf51422_xxac_s120"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="pstorage\pstorage.h">
+        <instance index="0">RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h</instance>
+        <component Cclass="nRF_Drivers" Cgroup="pstorage" Cvariant="default" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="pstorage"/>
+        <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
+        <targetInfos>
+          <targetInfo name="nrf51422_xxac_s120"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="pstorage\config\pstorage_platform.h">
+        <instance index="0">RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h</instance>
+        <component Cclass="nRF_Drivers" Cgroup="pstorage" Cvariant="default" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="pstorage"/>
         <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
         <targetInfos>
           <targetInfo name="nrf51422_xxac_s120"/>
