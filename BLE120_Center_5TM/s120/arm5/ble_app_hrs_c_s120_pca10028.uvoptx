@@ -161,9 +161,9 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\main.c</Filename>
+          <Filename>C:\Users\Yelun\Desktop\nRF51_SDK_8.0.0\BLE_central_sim900A-master\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nrf51422_xxac_s120\../../../main.c\81</Expression>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -305,8 +305,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>63</TopLine>
-      <CurrentLine>81</CurrentLine>
+      <TopLine>362</TopLine>
+      <CurrentLine>442</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
