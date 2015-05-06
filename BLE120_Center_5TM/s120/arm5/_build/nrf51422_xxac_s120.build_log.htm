@@ -4,36 +4,62 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\ble_app_hrs_c_s120_pca10028.uvprojx
-Project File Date:  04/24/2015
+Project File Date:  05/06/2015
 
 <h2>Output:</h2>
-Build target 'nrf51422_xxac_s120'
+Rebuild target 'nrf51422_xxac_s120'
 compiling main.c...
-..\..\..\main.c(225): warning:  #550-D: variable "err_code" was set but never used
+..\..\..\main.c(227): warning:  #550-D: variable "err_code" was set but never used
                                                 uint16_t err_code = 0;
-..\..\..\main.c(263): warning:  #177-D: variable "err_code" was declared but never referenced
-      uint32_t           err_code;
-..\..\..\main.c(318): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+..\..\..\main.c(335): warning:  #223-D: function "nrf_delay_ms" declared implicitly
                                 nrf_delay_ms(100);
-..\..\..\main.c(432): warning:  #223-D: function "nrf_delay_ms" declared implicitly
+..\..\..\main.c(377): warning:  #177-D: variable "count" was declared but never referenced
+                uint32_t count = 1;
+..\..\..\main.c(459): warning:  #223-D: function "nrf_delay_ms" declared implicitly
                 nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-..\..\..\main.c(433): warning:  #188-D: enumerated type mixed with another type
+..\..\..\main.c(460): warning:  #188-D: enumerated type mixed with another type
                 spi_base_address=spi_master_init(0, 0, 0);
-..\..\..\main.c(433): warning:  #188-D: enumerated type mixed with another type
+..\..\..\main.c(460): warning:  #188-D: enumerated type mixed with another type
                 spi_base_address=spi_master_init(0, 0, 0);
-..\..\..\main.c(42): warning:  #177-D: variable "spi_flash_pages" was declared but never referenced
+..\..\..\main.c(44): warning:  #177-D: variable "spi_flash_pages" was declared but never referenced
   static uint16_t spi_flash_pages=0;
-..\..\..\main.c(43): warning:  #177-D: variable "spi_flash_pages_count" was declared but never referenced
+..\..\..\main.c(45): warning:  #177-D: variable "spi_flash_pages_count" was declared but never referenced
   static uint16_t spi_flash_pages_count=0;
-..\..\..\main.c(53): warning:  #550-D: variable "pstorage_wait_flag" was set but never used
+..\..\..\main.c(55): warning:  #550-D: variable "pstorage_wait_flag" was set but never used
   static uint8_t pstorage_wait_flag = 0;
-..\..\..\main.c(411): warning:  #177-D: function "scheduler_init" was declared but never referenced
-  static void scheduler_init(void)
+..\..\..\main.c(411): warning:  #177-D: function "data_time_get" was declared but never referenced
+  static void data_time_get(void)
 ..\..\..\main.c: 10 warnings, 0 errors
+compiling battery.c...
+..\..\..\battery.c(65): warning:  #177-D: variable "percentage_batt_lvl" was declared but never referenced
+          uint8_t     percentage_batt_lvl;
+..\..\..\battery.c(66): warning:  #177-D: variable "err_code" was declared but never referenced
+          uint32_t    err_code;
+..\..\..\battery.c(95): warning:  #177-D: variable "err_code" was declared but never referenced
+      uint32_t err_code=0;
+..\..\..\battery.c: 3 warnings, 0 errors
+compiling spi_master.c...
+assembling arm_startup_nrf51.s...
+compiling system_nrf51.c...
+compiling ble_srv_common.c...
+compiling device_manager_central.c...
+compiling ble_db_discovery.c...
+compiling nrf_delay.c...
+compiling pstorage.c...
+compiling simple_uart.c...
+compiling app_uart.c...
+compiling app_error.c...
+compiling app_fifo.c...
+compiling app_timer.c...
+compiling app_trace.c...
+compiling nrf_assert.c...
+compiling retarget.c...
+compiling app_gpiote.c...
+compiling softdevice_handler.c...
 linking...
-Program Size: Code=10952 RO-data=224 RW-data=156 ZI-data=5972  
+Program Size: Code=11444 RO-data=224 RW-data=192 ZI-data=5800  
 FromELF: creating hex file...
-".\_build\nrf51422_xxac_s120.axf" - 0 Error(s), 10 Warning(s).
+"..\..\..\..\nrf51422_xxac_s120.axf" - 0 Error(s), 13 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -44,149 +70,182 @@ Package Vendor: ARM
    * Component: CORE Version: 3.20.0
 
 Package Vendor: NordicSemiconductor
-                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_DeviceFamilyPack/NordicSemiconductor.nRF_DeviceFamilyPack.1.1.4.pack
-                NordicSemiconductor::Device:Startup:1.0.1
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/NordicSemiconductor.nRF_BLE.2.0.0.pack
+                NordicSemiconductor::nRF_BLE:BLE_Modules:ble_service_common:2.0.0
+                Bluetooth Low Energy (Bluetooth Smart) services and software modules for Nordic Semiconductor nRF family.
+   * Component: ble_service_common Version: 2.0.0
+   * Component: ble_db_discovery Version: 2.0.0
+   * Component: device_manager Variant: Central Version: 2.0.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_DeviceFamilyPack/NordicSemiconductor.nRF_DeviceFamilyPack.7.1.0.pack
+                NordicSemiconductor::Device:Startup:7.1.0
                 Nordic Semiconductor nRF ARM devices Device Family Pack.
-   * Component: Startup Version: 1.0.1
+   * Component: Startup Version: 7.1.0
 
 Package Vendor: NordicSemiconductor
                 http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/NordicSemiconductor.nRF_Drivers.1.2.0.pack
-                NordicSemiconductor::nRF_Drivers:nrf_gpio:1.2.0
+                NordicSemiconductor::nRF_Drivers:simple_uart:1.2.0
                 Drivers for Nordic Semiconductor nRF family.
-   * Component: nrf_gpio Version: 1.2.0
-   * Component: nrf_delay Version: 1.2.0
-   * Component: nrf_error Variant: default Version: 1.2.0
    * Component: simple_uart Version: 1.2.0
-   * Component: pstorage Variant: default Version: 1.2.0
 
 Package Vendor: NordicSemiconductor
-                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/NordicSemiconductor.nRF_Libraries.1.1.0.pack
-                NordicSemiconductor::nRF_Libraries:app_error:1.1.0
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/NordicSemiconductor.nRF_Drivers.2.0.0.pack
+                NordicSemiconductor::nRF_Drivers:nrf_delay:2.0.0
+                Drivers for Nordic Semiconductor nRF family.
+   * Component: nrf_delay Version: 2.0.0
+   * Component: nrf_gpio Version: 2.0.0
+   * Component: nrf_error Variant: default Version: 2.0.0
+   * Component: pstorage Variant: default Version: 2.0.0
+   * Component: app_uart Variant: default Version: 2.0.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/NordicSemiconductor.nRF_Libraries.2.0.0.pack
+                NordicSemiconductor::nRF_Libraries:app_error:2.0.0
                 Software modules for Nordic Semiconductor nRF family.
-   * Component: app_error Version: 1.1.0
-   * Component: app_scheduler Variant: default Version: 1.1.0
-   * Component: app_timer Variant: default Version: 1.1.0
-   * Component: app_util Variant: default Version: 1.1.0
-   * Component: nrf_assert Version: 1.1.0
-   * Component: app_trace Variant: Dummy Version: 1.1.0
+   * Component: app_error Version: 2.0.0
+   * Component: app_gpiote Variant: default Version: 2.0.0
+   * Component: retarget Version: 2.0.0
+   * Component: app_fifo Version: 2.0.0
+   * Component: app_trace Variant: default Version: 2.0.0
+   * Component: nrf_assert Version: 2.0.0
+   * Component: app_timer Variant: default Version: 2.0.0
+   * Component: app_util Variant: default Version: 2.0.0
 
 Package Vendor: NordicSemiconductor
-                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_Common/NordicSemiconductor.nRF_SoftDevice_Common.1.1.0.pack
-                NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.0
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_Common/NordicSemiconductor.nRF_SoftDevice_Common.1.1.2.pack
+                NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.2
                 Common components for Nordic Semiconductor nRF family SoftDevices.
-   * Component: sd_common Variant: default Version: 1.1.0
-   * Component: softdevice_present Version: 1.1.0
+   * Component: sd_common Variant: default Version: 1.1.2
+   * Component: softdevice_present Version: 1.1.2
 
 Package Vendor: NordicSemiconductor
-                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_S120/NordicSemiconductor.nRF_SoftDevice_S120.1.0.1-3.pack
-                NordicSemiconductor::nRF_SoftDevice:s120:default:1.0.1-3
+                http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_SoftDevice_S120/NordicSemiconductor.nRF_SoftDevice_S120.2.0.0.pack
+                NordicSemiconductor::nRF_SoftDevice:s120:default:2.0.0
                 Components for Bluetooth Low Energy (Bluetooth Smart) S120 SoftDevice for Nordic Semiconductor nRF family.
-   * Component: s120 Variant: default Version: 1.0.1-3
+   * Component: s120 Variant: default Version: 2.0.0
 
 <h2>Collection of Component include folders:</h2>
   C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE
+  C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_BLE\nRF51822_xxAA
   C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA
   C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA
   C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\1.1.4\Device\Include
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\hal
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\pstorage
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_BLE\2.0.0\ble_db_discovery
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_BLE\2.0.0\common
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_BLE\2.0.0\device_manager
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\7.1.0\Device\Include
   C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\1.2.0\simple_uart
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\scheduler
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\timer
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\trace
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\1.1.0\util
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_Common\1.1.0\softdevice_handler
-  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\1.0.1-3\headers
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\2.0.0\hal
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\2.0.0\pstorage
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Drivers\2.0.0\uart
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\2.0.0\fifo
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\2.0.0\gpiote
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\2.0.0\timer
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\2.0.0\trace
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_Libraries\2.0.0\util
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_Common\1.1.2\softdevice_handler
+  C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\2.0.0\headers
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:3.20.0
 
-   * Component: NordicSemiconductor::Device:Startup:1.0.1
+   * Component: NordicSemiconductor::nRF_BLE:BLE_Modules:ble_service_common:2.0.0
+      Source file:   common\ble_srv_common.c
+      Include file:  common\ble_srv_common.h
+
+   * Component: NordicSemiconductor::nRF_BLE:BLE_Modules:ble_db_discovery:2.0.0
+      Source file:   ble_db_discovery\ble_db_discovery.c
+      Include file:  ble_db_discovery\ble_db_discovery.h
+
+   * Component: NordicSemiconductor::nRF_BLE:BLE_Modules:device_manager:Central:2.0.0
+      Source file:   device_manager\device_manager_central.c
+      Include file:  device_manager\config\device_manager_cnfg.h
+      Include file:  device_manager\device_manager.h
+
+   * Component: NordicSemiconductor::Device:Startup:7.1.0
       Source file:   Device\Source\arm\arm_startup_nrf51.s
       Source file:   Device\Source\system_nrf51.c
       Include file:  Device\Include\system_nrf51.h
-
-   * Component: NordicSemiconductor::nRF_Drivers:nrf_gpio:1.2.0
-      Include file:  hal\nrf_gpio.h
-
-   * Component: NordicSemiconductor::nRF_Drivers:nrf_delay:1.2.0
-      Source file:   hal\nrf_delay.c
-      Include file:  hal\nrf_delay.h
-
-   * Component: NordicSemiconductor::nRF_Drivers:nrf_error:default:1.2.0
 
    * Component: NordicSemiconductor::nRF_Drivers:simple_uart:1.2.0
       Source file:   simple_uart\simple_uart.c
       Include file:  simple_uart\simple_uart.h
 
-   * Component: NordicSemiconductor::nRF_Drivers:pstorage:default:1.2.0
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_delay:2.0.0
+      Source file:   hal\nrf_delay.c
+      Include file:  hal\nrf_delay.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_gpio:2.0.0
+      Include file:  hal\nrf_gpio.h
+
+   * Component: NordicSemiconductor::nRF_Drivers:nrf_error:default:2.0.0
+
+   * Component: NordicSemiconductor::nRF_Drivers:pstorage:default:2.0.0
+      Source file:   pstorage\pstorage.c
       Include file:  pstorage\pstorage.h
       Include file:  pstorage\config\pstorage_platform.h
-      Source file:   pstorage\pstorage.c
 
-   * Component: NordicSemiconductor::nRF_Libraries:app_error:1.1.0
-      Include file:  util\app_error.h
+   * Component: NordicSemiconductor::nRF_Drivers:app_uart:default:2.0.0
+      Source file:   uart\app_uart.c
+      Include file:  uart\app_uart.h
+
+   * Component: NordicSemiconductor::nRF_Libraries:app_error:2.0.0
       Source file:   util\app_error.c
+      Include file:  util\app_error.h
 
-   * Component: NordicSemiconductor::nRF_Libraries:app_scheduler:default:1.1.0
-      Include file:  scheduler\app_scheduler.h
-      Source file:   scheduler\app_scheduler.c
+   * Component: NordicSemiconductor::nRF_Libraries:app_gpiote:default:2.0.0
+      Source file:   gpiote\app_gpiote.c
+      Include file:  gpiote\app_gpiote.h
 
-   * Component: NordicSemiconductor::nRF_Libraries:app_timer:default:1.1.0
-      Include file:  timer\app_timer.h
-      Source file:   timer\app_timer.c
+   * Component: NordicSemiconductor::nRF_Libraries:retarget:2.0.0
+      Source file:   uart\retarget.c
 
-   * Component: NordicSemiconductor::nRF_Libraries:app_util:default:1.1.0
+   * Component: NordicSemiconductor::nRF_Libraries:app_fifo:2.0.0
+      Source file:   fifo\app_fifo.c
+      Include file:  fifo\app_fifo.h
 
-   * Component: NordicSemiconductor::nRF_Libraries:nrf_assert:1.1.0
+   * Component: NordicSemiconductor::nRF_Libraries:app_trace:default:2.0.0
+      Source file:   trace\app_trace.c
+      Include file:  trace\app_trace.h
+
+   * Component: NordicSemiconductor::nRF_Libraries:nrf_assert:2.0.0
       Source file:   util\nrf_assert.c
       Include file:  util\nrf_assert.h
 
-   * Component: NordicSemiconductor::nRF_Libraries:app_trace:Dummy:1.1.0
-      Include file:  trace\app_trace.h
+   * Component: NordicSemiconductor::nRF_Libraries:app_timer:default:2.0.0
+      Source file:   timer\app_timer.c
+      Include file:  timer\app_timer.h
 
-   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.0
+   * Component: NordicSemiconductor::nRF_Libraries:app_util:default:2.0.0
+
+   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:sd_common:default:1.1.2
       Source file:   softdevice_handler\softdevice_handler.c
 
-   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:softdevice_present:1.1.0
+   * Component: NordicSemiconductor::nRF_SoftDevice:Internal:softdevice_present:1.1.2
 
-   * Component: NordicSemiconductor::nRF_SoftDevice:s120:default:1.0.1-3
-      Include file:  headers\nrf_error_soc.h
-      Include file:  headers\ble_l2cap.h
-      Include file:  headers\nrf_soc.h
-      Include file:  headers\ble_gatts.h
-      Include file:  headers\ble_err.h
-      Include file:  headers\nrf_svc.h
-      Include file:  headers\ble_gattc.h
-      Include file:  headers\ble_gap.h
+   * Component: NordicSemiconductor::nRF_SoftDevice:s120:default:2.0.0
       Include file:  headers\ble.h
-      Include file:  headers\nrf_mbr.h
-      Include file:  headers\softdevice_assert.h
       Include file:  headers\ble_gatt.h
-      Include file:  headers\nrf_error_sdm.h
       Include file:  headers\ble_hci.h
-      Include file:  headers\nrf_error.h
-      Include file:  headers\nrf_sdm.h
       Include file:  headers\ble_types.h
+      Include file:  headers\nrf_error_soc.h
+      Include file:  headers\nrf_soc.h
+      Include file:  headers\ble_err.h
+      Include file:  headers\ble_gattc.h
+      Include file:  headers\ble_l2cap.h
+      Include file:  headers\nrf_error.h
+      Include file:  headers\nrf_mbr.h
+      Include file:  headers\nrf_svc.h
+      Include file:  headers\ble_gap.h
+      Include file:  headers\ble_gatts.h
       Include file:  headers\ble_ranges.h
-Load "C:\\Users\\Yelun\\Documents\\GitHub\\BLE_central_sim900A\\BLE120_Center_5TM\\s120\\arm5\\_build\\nrf51422_xxac_s120.axf" 
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "C:\\Users\\Yelun\\Documents\\GitHub\\BLE_central_sim900A\\BLE120_Center_5TM\\s120\\arm5\\_build\\nrf51422_xxac_s120.axf" 
-Set JLink Project File to "C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\JLinkSettings.ini"
-* JLink Info: Device "NRF51822_XXAA" selected (257 KB flash, 16 KB RAM).
- 
-JLink info:
-------------
-DLL: V4.92 , compiled Sep 30 2014 09:33:42
-Firmware: J-Link ARM V8 compiled Sep 22 2014 23:26:43
-Hardware: V8.00
-S/N : 286370559 
-Feature(s) : RDI,FlashDL,FlashBP,JFlash 
- 
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "C:\\Users\\Yelun\\Documents\\GitHub\\BLE_central_sim900A\\BLE120_Center_5TM\\s120\\arm5\\_build\\nrf51422_xxac_s120.axf" 
+      Include file:  headers\nrf_error_sdm.h
+      Include file:  headers\nrf_sdm.h
+      Include file:  headers\softdevice_assert.h
+      Include file:  headers\nrf_sd_def.h
+Load "..\\..\\..\\..\\nrf51422_xxac_s120.axf" 
 Set JLink Project File to "C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\JLinkSettings.ini"
 * JLink Info: Device "NRF51822_XXAA" selected (257 KB flash, 16 KB RAM).
  
@@ -206,7 +265,7 @@ ROMTableAddr = 0xE00FF003
 Target info:
 ------------
 Device: nRF51822_xxAA
-VTarget = 3.992V
+VTarget = 3.313V
 State of Pins: 
 TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
 Hardware-Breakpoints: 4
@@ -221,36 +280,3 @@ Application running ...
 </pre>
 </body>
 </html>
- 8192
-Watchpoints:          2
-JTAG speed: 4000 kHz
- 
-Erase Done.
-Programming Done.
-Verify OK.
-Application running ...
-aders\nrf_sdm.h
-      Include file:  headers\ble_types.h
-      Include file:  headers\ble_ranges.h
-Target not created
-ID 0x0BB11477
-* JLink Info: Found Cortex-M0 r0p0, Little endian.
-* JLink Info: FPUnit: 4 code (BP) slots and 0 literal slots
-ROMTableAddr = 0xE00FF003
- 
-Target info:
-------------
-Device: nRF51822_xxAA
-VTarget = 4.089V
-State of Pins: 
-TCK: 0, TDI: 0, TDO: 0, TMS: 1, TRES: 1, TRST: 1
-Hardware-Breakpoints: 4
-Software-Breakpoints: 8192
-Watchpoints:          2
-JTAG speed: 4000 kHz
- 
-Erase Done.
-Programming Done.
-Verify OK.
-Application running ...
-Error: Target DLL has been cancelled. Debugger aborted !
