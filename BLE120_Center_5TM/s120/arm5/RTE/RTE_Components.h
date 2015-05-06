@@ -10,7 +10,8 @@
 #ifndef RTE_COMPONENTS_H
 #define RTE_COMPONENTS_H
 
-#define S120
+#define BLE_STACK_SUPPORT_REQD
+  #define S120
 #define SOFTDEVICE_PRESENT
 
 #endif /* RTE_COMPONENTS_H */
