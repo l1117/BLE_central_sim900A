@@ -23,7 +23,7 @@
 .\_build\device_manager_central.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_BLE\nRF51822_xxAA\device_manager_cnfg.h
 .\_build\device_manager_central.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_trace.h
 .\_build\device_manager_central.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h
-.\_build\device_manager_central.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_BLE\2.0.0\common\ble_advdata.h
+.\_build\device_manager_central.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_BLE\nRF51822_xxAA\ble_advdata.h
 .\_build\device_manager_central.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h
 .\_build\device_manager_central.o: C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h
 .\_build\device_manager_central.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\7.1.0\Device\Include\nrf.h

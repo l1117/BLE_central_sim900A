@@ -812,6 +812,24 @@
         <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="device_manager" Cvariant="Central" Cvendor="NordicSemiconductor" Cversion="1.1.0" condition="device_manager_Central"/>
         <targetInfos/>
       </file>
+      <file attr="config" category="source" name="common\ble_advdata.c" version="2.0.0">
+        <instance index="0" removed="1">RTE\nRF_BLE\nRF51822_xxAA\ble_advdata.c</instance>
+        <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_advdata" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_advdata"/>
+        <package name="nRF_BLE" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/" vendor="NordicSemiconductor" version="2.0.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="header" name="common\ble_advdata.h" version="2.0.0">
+        <instance index="0" removed="1">RTE\nRF_BLE\nRF51822_xxAA\ble_advdata.h</instance>
+        <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_advdata" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_advdata"/>
+        <package name="nRF_BLE" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/" vendor="NordicSemiconductor" version="2.0.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" name="ble_advertising\ble_advertising.c" version="2.0.0">
+        <instance index="0" removed="1">RTE\nRF_BLE\nRF51822_xxAA\ble_advertising.c</instance>
+        <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_advertising" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_advertising"/>
+        <package name="nRF_BLE" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/" vendor="NordicSemiconductor" version="2.0.0"/>
+        <targetInfos/>
+      </file>
       <file attr="config" category="source" name="ble_db_discovery\ble_db_discovery.c" version="2.0.0">
         <instance index="0">RTE\nRF_BLE\nRF51822_xxAA\ble_db_discovery.c</instance>
         <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_db_discovery" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_db_discovery"/>

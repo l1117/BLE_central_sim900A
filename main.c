@@ -25,10 +25,11 @@
 #include "spi_master_config.h"
 #include "battery.h"
 #include "nrf_soc.h"
+
 static ble_gap_scan_params_t        m_scan_param;                        /**< Scan parameters requested for scanning and connection. */
 static app_timer_id_t           weakup_timer_id;                                   
 static app_timer_id_t  					weakup_meantimer_id	;
-static app_timer_id_t  					sim900a_timer_id	;
+//static app_timer_id_t  					sim900a_timer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
 #define MAX_rx_count 1024
 #define LEN_record 32
@@ -41,8 +42,6 @@ static app_timer_id_t  					sim900a_timer_id	;
 static uint8_t tx_data[MAX_rx_count]; /**< SPI TX buffer. */
 static uint8_t rx_data[256]; /**< Receive data buffer. */
 static uint32_t *spi_base_address;
-static uint16_t spi_flash_pages=0;
-static uint16_t spi_flash_pages_count=0;
 static uint32_t timer_counter=0;
 static uint16_t rx_count=0;
 static uint16_t month_days[12]={0,31,31+28,31+28+31,31+28+31+30,31+28+31+30+31,
@@ -55,6 +54,8 @@ static pstorage_block_t pstorage_wait_handle = 0;
 static uint8_t pstorage_wait_flag = 0;
 static uint32_t pstorage_block_id = 0;
 static uint8_t  pstorage_clear_nextpage = 0;
+static uint8_t  weakup_flag = false;
+
 void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(0xDEADBEEF, line_num, p_file_name);
@@ -80,6 +81,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     // On assert, the system can only recover with a reset.
     NVIC_SystemReset();
 }
+
 void send_string_no_answer(char * S)
 {
    while(*S)
@@ -349,65 +351,101 @@ static void sim900a_timeout_handler(void * p_context)
 				memset(tx_data,0,MAX_rx_count);
 				NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 }
-
-static void weakup_timeout_handler(void * p_context)
-{		
-    UNUSED_PARAMETER(p_context);
-		m_scan_param.active       = 0;            // Active scanning set.
-		m_scan_param.selective    = 0;            // Selective scanning not set.
-		m_scan_param.interval     = 0x10A0;     // Scan interval.
-		m_scan_param.window       = 0x109E;   // Scan window.
-		m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
-		m_scan_param.timeout      = 0x0000;       // No timeout.
-		uint32_t err_code = sd_ble_gap_scan_stop();
-     err_code = sd_ble_gap_scan_start(&m_scan_param);
-    APP_ERROR_CHECK(err_code);
-		timer_counter += TIME_PERIOD ;
-    app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
-//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-//		simple_uart_config(NULL, 8, NULL, 9, false);
-		
-//		if (rx_count>(MAX_rx_count-24)) rx_count=4;  //leave for tx command codes;
-
-}
-static void weakup_meantimeout_handler(void * p_context)
-{
-    UNUSED_PARAMETER(p_context);
-    uint32_t err_code = sd_ble_gap_scan_stop();
-		uint32_t count = 1;
-    APP_ERROR_CHECK(err_code);
-		pstorage_handle_t 		flash_handle;
-//		while (rx_count>=32){
-//						rx_count -= 32 ;
-//						pstorage_access_status_get(&count);
-//						if (count>6) 	
-//							nrf_delay_ms(10);
-		if (pstorage_clear_nextpage){
-						pstorage_block_identifier_get(&flash_base_handle,(pstorage_block_id/32 + 1 )* 32, &flash_handle);
-								err_code = pstorage_clear(&flash_handle,1024);
-								APP_ERROR_CHECK(err_code);
-								pstorage_clear_nextpage = 0;
-							}
-//						err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data+rx_count, 32, 0);
-//						pstorage_block_id++ ;
-//			}
-//			rx_count=0;
-      if (pstorage_block_id>(3200-32))	{
-				SCAN_TIMER_STOP ;
-				sim900a_timeout_handler(NULL);
-				SCAN_TIMER_STAR ;
-			}
-}
-
 static void example_cb_handler(pstorage_handle_t  * handle,
 															 uint8_t              op_code,
                                uint32_t             result,
                                uint8_t            * p_data,
                                uint32_t             data_len)
 {
-		if(handle->block_id == pstorage_wait_handle) { pstorage_wait_flag = 0; }  //If we are waiting for this callback, clear the wait flag.
+		if(handle->block_id == pstorage_wait_handle) { 
+					pstorage_wait_flag = 0; 
+				}  //If we are waiting for this callback, clear the wait flag.
 }
 
+static void sd_role_enable(uint8_t sd_role)
+{
+		uint32_t err_code;
+		err_code = sd_softdevice_disable();
+		APP_ERROR_CHECK(err_code);
+
+		//softdevice enable
+			SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, false);
+
+// Enable BLE stack.
+		ble_enable_params_t ble_enable_params;
+    memset(&ble_enable_params, 0, sizeof(ble_enable_params));
+
+    ble_enable_params.gatts_enable_params.service_changed = false;
+    ble_enable_params.gap_enable_params.role              = sd_role;  //BLE_GAP_ROLE_CENTRAL;
+
+    err_code = sd_ble_enable(&ble_enable_params);
+    APP_ERROR_CHECK(err_code);
+
+		err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+		APP_ERROR_CHECK(err_code);
+		err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
+		APP_ERROR_CHECK(err_code);
+}
+
+static void weakup_meantimeout_handler(void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+		weakup_flag = true ;
+		uint32_t err_code;
+		
+		err_code = sd_ble_gap_scan_stop();
+//    APP_ERROR_CHECK(err_code);
+
+		pstorage_handle_t 		flash_handle;
+		if (pstorage_clear_nextpage){
+						pstorage_block_identifier_get(&flash_base_handle,(pstorage_block_id/32 + 1 )* 32, &flash_handle);
+								err_code = pstorage_clear(&flash_handle,1024);
+								APP_ERROR_CHECK(err_code);
+								pstorage_clear_nextpage = 0;
+							}
+
+//		sd_role_enable(BLE_GAP_ROLE_PERIPH);
+//    APP_ERROR_CHECK(err_code);
+
+    if (pstorage_block_id>((1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS)/2)	{
+				sim900a_timeout_handler(NULL);
+			}
+		weakup_flag = false ;
+
+}
+
+
+
+static void weakup_timeout_handler(void * p_context)
+{		
+    UNUSED_PARAMETER(p_context);
+		uint32_t err_code;
+		timer_counter += TIME_PERIOD ;
+		if (weakup_flag) return;
+
+//		sd_role_enable(BLE_GAP_ROLE_CENTRAL);
+			battery_start(6);
+			uint32_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
+    if (batt_lvl_in_milli_volts +600 > 3700 ){
+					if (pstorage_block_id>((1024 / PSTORAGE_BLOCK_SIZE) * (PSTORAGE_MAX_APPLICATIONS-1)))	{
+							weakup_meantimeout_handler(NULL);
+							return;
+						}
+
+						m_scan_param.active       = 0;            // Active scanning set.
+						m_scan_param.selective    = 0;            // Selective scanning not set.
+						m_scan_param.interval     = 0x10A0;     // Scan interval.
+						m_scan_param.window       = 0x109E;   // Scan window.
+						m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
+						m_scan_param.timeout      = 0x0000;       // No timeout.
+						 err_code = sd_ble_gap_scan_stop();
+						 err_code = sd_ble_gap_scan_start(&m_scan_param);
+						APP_ERROR_CHECK(err_code);
+						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
+				//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+				//		simple_uart_config(NULL, 8, NULL, 9, false);
+				}
+}
 static void data_time_get(void)
 	{
 			send_string("AT\r\n","OK");
@@ -438,6 +476,7 @@ static void data_time_get(void)
 //{
 //    APP_TIMER_INIT(0,5, SCHED_QUEUE_SIZE,NULL);
 //}
+
 int main(void)
 {
 	uint32_t err_code;
@@ -457,16 +496,16 @@ int main(void)
 
 //AT45DB161 sleep down
 	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-		spi_base_address=spi_master_init(0, 0, 0);
+		spi_base_address = spi_master_init(0, 0, 0);
 		uint8_t spi_data[1]={0XB9};
     spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)spi_data, spi_data);
 
-//	simple_uart_config(NULL, 8, NULL, 9, false);
-//		data_time_get();	
-//		if (!timer_counter) 	{
-//			nrf_delay_ms(10000);
-//			NVIC_SystemReset();
-//			}
+	simple_uart_config(NULL, 8, NULL, 9, false);
+		data_time_get();	
+		if (!timer_counter) 	{
+			nrf_delay_ms(10000);
+			NVIC_SystemReset();
+			}
 	
   nrf_gpio_pin_clear(GTM900_power_pin);
 	NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
@@ -474,23 +513,7 @@ int main(void)
 //				simple_uart_config(NULL, 8, NULL, 9, false);
 //						simple_uart_put( 0xEE);
 
-//softdevice enable
-			SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, false);
-
-// Enable BLE stack.
-		ble_enable_params_t ble_enable_params;
-    memset(&ble_enable_params, 0, sizeof(ble_enable_params));
-
-    ble_enable_params.gatts_enable_params.service_changed = false;
-    ble_enable_params.gap_enable_params.role              = BLE_GAP_ROLE_CENTRAL;
-
-    err_code = sd_ble_enable(&ble_enable_params);
-    APP_ERROR_CHECK(err_code);
-
-		err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
-		APP_ERROR_CHECK(err_code);
-		err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
-		APP_ERROR_CHECK(err_code);
+		sd_role_enable(BLE_GAP_ROLE_CENTRAL);
 
 		pstorage_module_param_t		 param;
 		pstorage_init();
@@ -511,9 +534,9 @@ int main(void)
 			err_code = app_timer_create(&weakup_meantimer_id,
 																	APP_TIMER_MODE_SINGLE_SHOT,
 																	weakup_meantimeout_handler);
-			err_code = app_timer_create(&sim900a_timer_id,
-																	APP_TIMER_MODE_REPEATED,
-																	sim900a_timeout_handler);
+//			err_code = app_timer_create(&sim900a_timer_id,
+//																	APP_TIMER_MODE_REPEATED,
+//																	sim900a_timeout_handler);
 //			err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL);
 			err_code = SCAN_TIMER_STAR ;
 			APP_ERROR_CHECK(err_code);
