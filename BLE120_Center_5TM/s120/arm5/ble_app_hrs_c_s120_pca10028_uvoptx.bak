@@ -152,7 +152,7 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>87</LineNumber>
+          <LineNumber>89</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>120360</Address>
           <ByteObject>0</ByteObject>
@@ -164,6 +164,22 @@
           <Filename>C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>411</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>130840</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\Yelun\Documents\GitHub\BLE_central_sim900A\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\nrf51422_xxac_s120\../../../main.c\411</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -301,7 +317,7 @@
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>0</aSer4>
-        <StkLoc>0</StkLoc>
+        <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
         <uProt>0</uProt>
@@ -323,10 +339,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>9</ColumnNumber>
+      <ColumnNumber>88</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>326</TopLine>
-      <CurrentLine>95</CurrentLine>
+      <TopLine>369</TopLine>
+      <CurrentLine>391</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -339,10 +355,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>72</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>90</TopLine>
+      <CurrentLine>97</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\battery.c</PathWithFileName>
       <FilenameWithoutPath>battery.c</FilenameWithoutPath>
@@ -429,8 +445,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>152</TopLine>
-      <CurrentLine>160</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\Device\nRF51822_xxAA\arm_startup_nrf51.s</PathWithFileName>
       <FilenameWithoutPath>arm_startup_nrf51.s</FilenameWithoutPath>
@@ -619,9 +635,9 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>37</ColumnNumber>
+      <ColumnNumber>38</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>30</TopLine>
+      <TopLine>35</TopLine>
       <CurrentLine>43</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h</PathWithFileName>
@@ -771,10 +787,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>11</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1123</TopLine>
+      <CurrentLine>1091</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_Libraries\nRF51822_xxAA\app_timer.c</PathWithFileName>
       <FilenameWithoutPath>app_timer.c</FilenameWithoutPath>
@@ -787,7 +803,7 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>33</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -893,70 +909,6 @@
       <RteFlg>1</RteFlg>
       <bShared>0</bShared>
     </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>34</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>159</TopLine>
-      <CurrentLine>188</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>RTE\nRF_Libraries\nRF51822_xxAA\app_scheduler.c</PathWithFileName>
-      <FilenameWithoutPath>app_scheduler.c</FilenameWithoutPath>
-      <RteFlg>1</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>35</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>RTE\nRF_Libraries\nRF51822_xxAA\app_scheduler.h</PathWithFileName>
-      <FilenameWithoutPath>app_scheduler.h</FilenameWithoutPath>
-      <RteFlg>1</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>36</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>RTE\nRF_Libraries\nRF51822_xxAA\app_timer_appsh.c</PathWithFileName>
-      <FilenameWithoutPath>app_timer_appsh.c</FilenameWithoutPath>
-      <RteFlg>1</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>37</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>RTE\nRF_Libraries\nRF51822_xxAA\app_timer_appsh.h</PathWithFileName>
-      <FilenameWithoutPath>app_timer_appsh.h</FilenameWithoutPath>
-      <RteFlg>1</RteFlg>
-      <bShared>0</bShared>
-    </File>
   </Group>
 
   <Group>
@@ -967,7 +919,7 @@
     <RteFlg>1</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>38</FileNumber>
+      <FileNumber>34</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -983,7 +935,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>39</FileNumber>
+      <FileNumber>35</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -994,22 +946,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_SoftDevice\nRF51822_xxAA\softdevice_handler.c</PathWithFileName>
       <FilenameWithoutPath>softdevice_handler.c</FilenameWithoutPath>
-      <RteFlg>1</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>40</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>RTE\nRF_SoftDevice\nRF51822_xxAA\softdevice_handler_appsh.c</PathWithFileName>
-      <FilenameWithoutPath>softdevice_handler_appsh.c</FilenameWithoutPath>
       <RteFlg>1</RteFlg>
       <bShared>0</bShared>
     </File>

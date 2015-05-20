@@ -37,8 +37,9 @@ static app_timer_id_t  					weakup_meantimer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
 #define MAX_rx_count 1024
 #define LEN_record 32
-#define GTM900_power_pin 4
-#define TIME_PERIOD 5        //seconds
+//#define GTM900_power_pin 4
+#define GTM900_power_pin 8    //for GPS box PCB
+#define TIME_PERIOD 300        //seconds
 #define PSTORAGE_BLOCK_SIZE   1024   //  32 
 #define SCAN_TIMER_STAR    app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL)
 #define SCAN_TIMER_STOP    app_timer_stop(weakup_timer_id)
@@ -146,16 +147,22 @@ void gprs_gtm900()
 //		simple_uart_config(NULL, 8, NULL, 9, false);
 			send_string("AT\r\n","OK");
 			send_string("AT\r\n","OK");
-			send_string("ATE0\r\n","OK");
+			send_string("ATE1\r\n","OK");
 			if(!send_string("AT+CPIN?\r\n","READY")) return; //error
-//////			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
-////////			if (send_string("","DST:")||send_string("","DST:"))	send_string("AT+CCLK?\r\n","OK");
-//////			(send_string("","DST:")||send_string("","DST:"));  //wait for time stamp almost 2 timrs 10 Secs.
-//////			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
-//			send_string("AT%SLEEP=0\r\n","OK");
-//			send_string("AT+CGREG=1\r\n"); 
-//connect smtp server
-//			send_string("AT%IOMODE=1,1,0\r\n","OK");
+
+			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
+			if ((send_string("","DST:")||send_string("","DST:"))	
+						&& send_string("AT+CCLK?\r\n","OK") && (rx_data[21]=='1' && rx_data[22]>='5')){
+					rx_data[24] = (rx_data[24]-'0')*10 + (rx_data[25]-'0');  	//month
+					rx_data[27] = (rx_data[27]-'0')*10 + (rx_data[28]-'0');		//day
+					rx_data[30] = (rx_data[30]-'0')*10 + (rx_data[31]-'0');		//hour
+					rx_data[33] = (rx_data[33]-'0')*10 + (rx_data[34]-'0');		//minus
+					rx_data[36] = (rx_data[36]-'0')*10 + (rx_data[37]-'0');		//second
+					timer_counter = ((((month_days[rx_data[24]-1]+rx_data[27])*24 + rx_data[30])*60 + rx_data[33])*60 + rx_data[36]);
+					}
+			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
+			send_string("ATE0\r\n","OK");
+
 
 			send_string("at+csq\r\n","OK");  	//ÐÅºÅÖÊÁ¿
 //			send_string("at%ipclose=1\r\n","OK");
@@ -203,8 +210,9 @@ void gprs_gtm900()
 			subject[29]=char_hex((pstorage_block_id>>8));
 			subject[30]=char_hex((pstorage_block_id>>4));
 			subject[31]=char_hex(pstorage_block_id);
-			battery_start(6);
-			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
+//			battery_start(6);
+			battery_start(5);
+			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
 			subject[32]=';';
 			subject[33]=char_hex(batt_lvl_in_milli_volts>>12);
 			subject[34]=char_hex((batt_lvl_in_milli_volts>>8));
@@ -239,7 +247,8 @@ void gprs_gtm900()
 					if (!(i%LEN_record)){
 							simple_uart_put('\r');
 							simple_uart_put('\n');
-								if ((i==512) || (i==MAX_rx_count)) {
+								if ((i==512) || (i==MAX_rx_count) 
+											||(!(tx_data[i] + tx_data[i-1] + tx_data[i-2] + tx_data[i-3] + tx_data[i-4] ))) {
 										simple_uart_put(char_hex(timer_counter>>12));
 										simple_uart_put(char_hex(timer_counter>>8));
 										simple_uart_put(char_hex(timer_counter>>4));
@@ -364,22 +373,23 @@ static void weakup_meantimeout_handler(void * p_context)
 
 		err_code = sd_ble_gap_scan_stop();
 //    APP_ERROR_CHECK(err_code);
-		pstorage_access_status_get(&pstorage_count);
+//		pstorage_access_status_get(&pstorage_count);
 
 //		sd_role_enable(BLE_GAP_ROLE_PERIPH);
-
-		pstorage_handle_t 		flash_handle;
-		pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
-		err_code = pstorage_clear(&flash_handle,1024);
-		APP_ERROR_CHECK(err_code);
-		err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
-		APP_ERROR_CHECK(err_code);
-		pstorage_block_id++ ;
+		if (tx_data[0] || tx_data[1] || tx_data[2] || tx_data[3] || tx_data[4]){
+				pstorage_handle_t 		flash_handle;
+				pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
+				err_code = pstorage_clear(&flash_handle,1024);
+				APP_ERROR_CHECK(err_code);
+				err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
+				APP_ERROR_CHECK(err_code);
+				pstorage_block_id++ ;
+				}
 ////test
 //			pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
 //			err_code = pstorage_clear(&flash_handle,1024);
 //			APP_ERROR_CHECK(err_code);
-		if ((time_period_count > 300) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+		if ((time_period_count > 3600) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/10)))	{
 				weakup_flag = true ;
 			}
 }
@@ -396,9 +406,10 @@ static void weakup_timeout_handler(void * p_context)
 		memset(tx_data,0,MAX_rx_count);
 		rx_count = 0;
 		
-		battery_start(6);
-		uint32_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
-    if (batt_lvl_in_milli_volts +600 < 3700 ){
+////		battery_start(6);
+		battery_start(5);
+		uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
+    if (batt_lvl_in_milli_volts + 1600 < 3700 ){
 							return;
 						}
 		if (pstorage_block_id<(PSTORAGE_MAX_APPLICATIONS-1)) {
@@ -486,15 +497,19 @@ int main(void)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
-		nrf_gpio_pin_set(GTM900_power_pin);
 
 //AT45DB161 sleep down
-	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-		spi_base_address = spi_master_init(0, 0, 0);
-		uint8_t spi_data[1]={0XB9};
-    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)spi_data, spi_data);
+//	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
+//		spi_base_address = spi_master_init(0, 0, 0);
+//		uint8_t spi_data[1]={0XB9};
+//    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)spi_data, spi_data);
 
-	  simple_uart_config(NULL, 8, NULL, 9, false);
+
+		nrf_gpio_pin_set(GTM900_power_pin);
+
+//	  simple_uart_config(NULL, 8, NULL, 9, false);
+						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
+
 		data_time_get();	
 		if (!timer_counter) {
 					nrf_delay_ms(10000);
@@ -522,8 +537,8 @@ int main(void)
 						nrf_gpio_pin_set(GTM900_power_pin);
 
 						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-						simple_uart_config(NULL, 8, NULL, 9, false);
-
+//						simple_uart_config(NULL, 8, NULL, 9, false);
+						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
 						gprs_gtm900();
 						if ((pstorage_block_id) && 
 								send_string("\r\n\x1a","OK")  &&
