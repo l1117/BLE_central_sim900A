@@ -39,7 +39,7 @@ static app_timer_id_t  					weakup_meantimer_id	;
 #define LEN_record 32
 //#define GTM900_power_pin 4
 #define GTM900_power_pin 8    //for GPS box PCB
-#define TIME_PERIOD 300        //seconds
+#define TIME_PERIOD 300       //seconds
 #define PSTORAGE_BLOCK_SIZE   1024   //  32 
 #define SCAN_TIMER_STAR    app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL)
 #define SCAN_TIMER_STOP    app_timer_stop(weakup_timer_id)
@@ -241,23 +241,24 @@ void gprs_gtm900()
 						err_code = pstorage_load((uint8_t *)tx_data, &flash_handle,1024,0);
 						APP_ERROR_CHECK(err_code);
 			for (uint16_t i=1; i <= MAX_rx_count; i++){
-//			for (uint16_t i=0;i<LEN_record;i++){
 					simple_uart_put(char_hex(tx_data[i-1]>>4));
 					simple_uart_put(char_hex(tx_data[i-1]));
 					if (!(i%LEN_record)){
 							simple_uart_put('\r');
 							simple_uart_put('\n');
 								if ((i==512) || (i==MAX_rx_count) 
-											||(!(tx_data[i] + tx_data[i-1] + tx_data[i-2] + tx_data[i-3] + tx_data[i-4] ))) {
-										simple_uart_put(char_hex(timer_counter>>12));
-										simple_uart_put(char_hex(timer_counter>>8));
-										simple_uart_put(char_hex(timer_counter>>4));
-										simple_uart_put(char_hex(timer_counter));
-										simple_uart_put('\r');
-										simple_uart_put('\n');
+											||(!(tx_data[i] | tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4] ))) {
+												battery_start(5);
+												uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
+												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>12));
+												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>8));
+												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>4));
+												simple_uart_put(char_hex(batt_lvl_in_milli_volts));
+												simple_uart_put('\r');
+												simple_uart_put('\n');
 										send_string("\x1a","OK");	
-										if (!send_string("AT+CIPSEND\r\n",">")) return;	
-     								if (!(tx_data[i] + tx_data[i-1] + tx_data[i-2] + tx_data[i-3] + tx_data[i-4] )) break;
+										if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
+     								if (!(tx_data[i] | tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4] )) break;
 										}
 							}
 				}
@@ -389,7 +390,8 @@ static void weakup_meantimeout_handler(void * p_context)
 //			pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
 //			err_code = pstorage_clear(&flash_handle,1024);
 //			APP_ERROR_CHECK(err_code);
-		if ((time_period_count > 3600) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/10)))	{
+		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+//		if ((time_period_count > 300) && (pstorage_block_id ))	{
 				weakup_flag = true ;
 			}
 }
@@ -428,7 +430,7 @@ static void weakup_timeout_handler(void * p_context)
 						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
 				//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
 				//		simple_uart_config(NULL, 8, NULL, 9, false);
-		} else weakup_flag = true;
+		} else if (time_period_count > 3600) weakup_flag = true;
 	
 }
 static void data_time_get(void)

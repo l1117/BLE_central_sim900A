@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\_build\nrf51422_xxac_s120.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\_build\nrf51422_xxac_s120.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Wed May 20 13:51:50 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Sun May 24 10:17:39 2015
 <BR><P>
 <H3>Maximum Stack Usage =        212 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -407,7 +407,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gprs_gtm900
 </UL>
 
-<P><STRONG><a name="[57]"></a>gprs_gtm900</STRONG> (Thumb, 1730 bytes, Stack size 80 bytes, main.o(i.gprs_gtm900))
+<P><STRONG><a name="[57]"></a>gprs_gtm900</STRONG> (Thumb, 1770 bytes, Stack size 80 bytes, main.o(i.gprs_gtm900))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = gprs_gtm900 &rArr; send_string &rArr; simple_uart_get_with_timeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;simple_uart_put
@@ -662,7 +662,7 @@ Local Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(i.timers_init)
 </UL>
-<P><STRONG><a name="[26]"></a>weakup_timeout_handler</STRONG> (Thumb, 202 bytes, Stack size 24 bytes, main.o(i.weakup_timeout_handler))
+<P><STRONG><a name="[26]"></a>weakup_timeout_handler</STRONG> (Thumb, 214 bytes, Stack size 24 bytes, main.o(i.weakup_timeout_handler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = weakup_timeout_handler &rArr; app_timer_start &rArr; timer_start_op_schedule &rArr; user_op_alloc
 </UL>
 <BR>[Calls]<UL><LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;battery_start
