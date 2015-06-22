@@ -93,9 +93,9 @@ void ADC_IRQHandler(void)
 void battery_start(uint32_t AnalogInput)
 {
     uint32_t err_code=0;
-		if (AnalogInput==4)  AnalogInput=ADC_CONFIG_PSEL_AnalogInput4 ;
-		else if (AnalogInput==5)  AnalogInput=ADC_CONFIG_PSEL_AnalogInput5 ;
-		else  AnalogInput=ADC_CONFIG_PSEL_AnalogInput6 ;
+//		if (AnalogInput==4)  AnalogInput=ADC_CONFIG_PSEL_AnalogInput4 ;
+//		else if (AnalogInput==5)  AnalogInput=ADC_CONFIG_PSEL_AnalogInput5 ;
+//		else  AnalogInput=ADC_CONFIG_PSEL_AnalogInput6 ;
     // Configure ADC
     NRF_ADC->INTENSET   = ADC_INTENSET_END_Msk;
     NRF_ADC->CONFIG     = (ADC_CONFIG_RES_8bit                        << ADC_CONFIG_RES_Pos)     |

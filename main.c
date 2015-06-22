@@ -38,7 +38,9 @@ static app_timer_id_t  					weakup_meantimer_id	;
 #define MAX_rx_count 1024
 #define LEN_record 32
 //#define GTM900_power_pin 4
-#define GTM900_power_pin 8    //for GPS box PCB
+//#define GTM900_power_pin 8    //for GPS box PCB old Version PCB
+#define GTM900_power_pin 18    //for GPS box PCB
+#define VCC5_power_pin 8       //for GPS box PCB
 #define TIME_PERIOD 300       //seconds
 #define PSTORAGE_BLOCK_SIZE   1024   //  32 
 #define SCAN_TIMER_STAR    app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL)
@@ -60,7 +62,7 @@ static pstorage_block_t pstorage_wait_handle = 0;
 static uint8_t pstorage_wait_flag = 0;
 static pstorage_size_t pstorage_block_id = 0;
 static uint8_t  pstorage_clear_nextpage = 0;
-static uint8_t  weakup_flag = false;
+static uint8_t  weakup_flag = false;   
 static uint32_t  pstorage_count = 0;
 
 void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
@@ -107,6 +109,7 @@ bool send_string(char * S,char * Respond)
 //	 char * SR; 
 		
 		uint8_t r=0,i=Rcount;
+		while(simple_uart_get_with_timeout(1,rx_data));
 		memset(rx_data,0,256);
    while(*S)
     {
@@ -211,7 +214,7 @@ void gprs_gtm900()
 			subject[30]=char_hex((pstorage_block_id>>4));
 			subject[31]=char_hex(pstorage_block_id);
 //			battery_start(6);
-			battery_start(5);
+			battery_start(ADC_CONFIG_PSEL_AnalogInput5);
 			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
 			subject[32]=';';
 			subject[33]=char_hex(batt_lvl_in_milli_volts>>12);
@@ -248,7 +251,7 @@ void gprs_gtm900()
 							simple_uart_put('\n');
 								if ((i==512) || (i==MAX_rx_count) 
 											||(!(tx_data[i] | tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4] ))) {
-												battery_start(5);
+												battery_start(ADC_CONFIG_PSEL_AnalogInput5);
 												uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
 												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>12));
 												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>8));
@@ -386,10 +389,6 @@ static void weakup_meantimeout_handler(void * p_context)
 				APP_ERROR_CHECK(err_code);
 				pstorage_block_id++ ;
 				}
-////test
-//			pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
-//			err_code = pstorage_clear(&flash_handle,1024);
-//			APP_ERROR_CHECK(err_code);
 		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
 //		if ((time_period_count > 300) && (pstorage_block_id ))	{
 				weakup_flag = true ;
@@ -409,7 +408,7 @@ static void weakup_timeout_handler(void * p_context)
 		rx_count = 0;
 		
 ////		battery_start(6);
-		battery_start(5);
+		battery_start(ADC_CONFIG_PSEL_AnalogInput5);
 		uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
     if (batt_lvl_in_milli_volts + 1600 < 3700 ){
 							return;
@@ -454,7 +453,7 @@ static void data_time_get(void)
 			send_string("AT+CIPSHUT\r\n","OK");
 			send_string("AT+CGATT=0\r\n","OK");
 			send_string("AT+CPOWD=1\r\n","POWER");
-			nrf_gpio_pin_clear(GTM900_power_pin);
+//			nrf_gpio_pin_clear(GTM900_power_pin);
 	}
 
 #define APP_TIMER_PRESCALER             0                                          /**< Value of the RTC1 PRESCALER register. */
@@ -499,6 +498,12 @@ int main(void)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+		NRF_GPIO->PIN_CNF[VCC5_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
+																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
+																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
+																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
+																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+		nrf_gpio_pin_clear(VCC5_power_pin);
 
 //AT45DB161 sleep down
 //	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
@@ -509,17 +514,19 @@ int main(void)
 
 		nrf_gpio_pin_set(GTM900_power_pin);
 
-//	  simple_uart_config(NULL, 8, NULL, 9, false);
-						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
+//						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
+						simple_uart_config(NULL, 23, NULL, 24, false);  // for GPS box PCB
 
-		data_time_get();	
+//		data_time_get();	
+		gprs_gtm900();
+		nrf_gpio_pin_clear(GTM900_power_pin);
+		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+
 		if (!timer_counter) {
 					nrf_delay_ms(10000);
 					NVIC_SystemReset();
 					}
 	
-		nrf_gpio_pin_clear(GTM900_power_pin);
-		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 
 		pstorage_module_param_t		 param;
 		pstorage_init();
@@ -540,7 +547,7 @@ int main(void)
 
 						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
 //						simple_uart_config(NULL, 8, NULL, 9, false);
-						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
+						simple_uart_config(NULL, 23, NULL, 24, false);  // for GPS box PCB
 						gprs_gtm900();
 						if ((pstorage_block_id) && 
 								send_string("\r\n\x1a","OK")  &&
