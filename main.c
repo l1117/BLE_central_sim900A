@@ -95,6 +95,7 @@ void send_string_no_answer(char * S)
 {
    while(*S)
     {
+				while(simple_uart_get_with_timeout(5,rx_data));
         simple_uart_put(*S++);
 				}
 }
@@ -109,7 +110,7 @@ bool send_string(char * S,char * Respond)
 //	 char * SR; 
 		
 		uint8_t r=0,i=Rcount;
-		while(simple_uart_get_with_timeout(1,rx_data));
+		while(simple_uart_get_with_timeout(5,rx_data));
 		memset(rx_data,0,256);
    while(*S)
     {
@@ -178,26 +179,25 @@ void gprs_gtm900()
 			send_string("AT+CIFSR\r\n",".");
 			send_string("AT+CIPCLOSE=1\r\n","OK");
 
-			if(!(send_string("AT+CIPSTART=\"TCP\",\"159.226.251.11\",25\r\n","cstnet")||send_string("","cstnet"))) return;
+			if(!(send_string("AT+CIPSTART=\"TCP\",\"159.226.251.11\",25\r\n","220")||send_string("","220"))) return;
 
 //send mail
 			send_string("AT+CIPSPRT=1\r\n","OK");
 			send_string("AT+CIPSEND\r\n",">");			
 			send_string("ehlo helo\r\n\x1a","coremail");			//ehlo helo
 			send_string("AT+CIPSEND\r\n",">");		
-			send_string("auth login\r\n\x1a","SEND");		//auth login
+			send_string("auth login\r\n\x1a","334");		//auth login
 			send_string("AT+CIPSEND\r\n",">");		
-			send_string("Y2NkYw==\r\n\x1a","SEND");				//user name: ccdc
+			send_string("Y2NkYw==\r\n\x1a","334");				//user name: ccdc
 			send_string("AT+CIPSEND\r\n",">");		
-			if(!send_string("Y2NkY2NzdG5ldA==\r\n\x1a","successful")) 
-							return;//passwore: ********
+			if(!send_string("Y2NkY2NzdG5ldA==\r\n\x1a","235"))	return;//passwore: ********
 
 			send_string("AT+CIPSEND\r\n",">");		
-			send_string("MAIL FROM:<lye@cstnet.cn>\r\n\x1a","SEND");//mail from lye@cstnet.cn
+			send_string("MAIL FROM:<lye@cstnet.cn>\r\n\x1a","250");//mail from lye@cstnet.cn
 			send_string("AT+CIPSEND\r\n",">");		
-			send_string("RCPT to:<ccdc@cstnet.cn>\r\n\x1a","SEND");//RCPT to:<ccdc@cstnet.cn>
+			send_string("RCPT to:<ccdc@cstnet.cn>\r\n\x1a","250");//RCPT to:<ccdc@cstnet.cn>
 			send_string("AT+CIPSEND\r\n",">");		
-			if(!send_string("DATA\r\n\x1a","SEND")) return;//DATA
+			if(!send_string("DATA\r\n\x1a","354")) return;//DATA
 
 			send_string("AT+CREG=2\r\n","OK");
 
@@ -236,48 +236,37 @@ void gprs_gtm900()
 			send_string("AT+CIPSEND\r\n",">");
 //			send_string("AT+CIPSEND?\r\n","OK");
 //		for (uint16_t block_id=0; block_id<(1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS; block_id++){
-		for (uint16_t block_id = 0; block_id < (pstorage_block_id-1); block_id++){
+		for (uint16_t block_id = 0; block_id <= (pstorage_block_id-1); block_id++){
 //send data area
 						pstorage_handle_t 		flash_handle;
 						pstorage_block_identifier_get(&flash_base_handle, block_id, &flash_handle);
 						uint16_t err_code = 0;
 						err_code = pstorage_load((uint8_t *)tx_data, &flash_handle,1024,0);
 						APP_ERROR_CHECK(err_code);
+			while(simple_uart_get_with_timeout(1,rx_data));
 			for (uint16_t i=1; i <= MAX_rx_count; i++){
 					simple_uart_put(char_hex(tx_data[i-1]>>4));
 					simple_uart_put(char_hex(tx_data[i-1]));
 					if (!(i%LEN_record)){
 							simple_uart_put('\r');
 							simple_uart_put('\n');
-								if ((i==512) || (i==MAX_rx_count) 
-											||(!(tx_data[i] | tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4] ))) {
-												battery_start(ADC_CONFIG_PSEL_AnalogInput5);
-												uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
-												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>12));
-												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>8));
-												simple_uart_put(char_hex(batt_lvl_in_milli_volts>>4));
-												simple_uart_put(char_hex(batt_lvl_in_milli_volts));
-												simple_uart_put('\r');
-												simple_uart_put('\n');
+								if (i==512 || i==1024) {
 										send_string("\x1a","OK");	
 										if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
-     								if (!(tx_data[i] | tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4] )) break;
+										while(simple_uart_get_with_timeout(1,rx_data));
+
 										}
 							}
 				}
-
-//			send_string("\x1a","OK");	
-//			if (!send_string("AT+CIPSEND\r\n",">")) return;	
-
+			send_string("\r\n\x1a","OK");	
+			if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
+			while(simple_uart_get_with_timeout(1,rx_data));
 			}
-			if (send_string("\r\n\x1a","OK") &&
-					send_string("AT+CIPSEND\r\n",">") &&
-					send_string("\r\n\x2e\r\n\x1a","OK")) {
+			if (send_string("\r\n\x2e\r\n\x1a","250")) {
 							pstorage_block_id = 0;
 							send_string("AT+CIPCLOSE=1\r\n","OK");
 					}
 			else return;
-
 }
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
@@ -390,7 +379,7 @@ static void weakup_meantimeout_handler(void * p_context)
 				pstorage_block_id++ ;
 				}
 		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
-//		if ((time_period_count > 300) && (pstorage_block_id ))	{
+//		if ((time_period_count >= 3600) && (pstorage_block_id ))	{
 				weakup_flag = true ;
 			}
 }
@@ -432,29 +421,6 @@ static void weakup_timeout_handler(void * p_context)
 		} else if (time_period_count > 3600) weakup_flag = true;
 	
 }
-static void data_time_get(void)
-	{
-			send_string("AT\r\n","OK");
-			send_string("AT\r\n","OK");
-			send_string("ATE1\r\n","OK");
-			send_string("AT+CPIN?\r\n","READY");
-
-			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
-			if ((send_string("","DST:")||send_string("","DST:"))	
-						&& send_string("AT+CCLK?\r\n","OK") && (rx_data[21]=='1' && rx_data[22]>='5')){
-					rx_data[24] = (rx_data[24]-'0')*10 + (rx_data[25]-'0');  	//month
-					rx_data[27] = (rx_data[27]-'0')*10 + (rx_data[28]-'0');		//day
-					rx_data[30] = (rx_data[30]-'0')*10 + (rx_data[31]-'0');		//hour
-					rx_data[33] = (rx_data[33]-'0')*10 + (rx_data[34]-'0');		//minus
-					rx_data[36] = (rx_data[36]-'0')*10 + (rx_data[37]-'0');		//second
-					timer_counter = ((((month_days[rx_data[24]-1]+rx_data[27])*24 + rx_data[30])*60 + rx_data[33])*60 + rx_data[36]);
-					}
-			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
-			send_string("AT+CIPSHUT\r\n","OK");
-			send_string("AT+CGATT=0\r\n","OK");
-			send_string("AT+CPOWD=1\r\n","POWER");
-//			nrf_gpio_pin_clear(GTM900_power_pin);
-	}
 
 #define APP_TIMER_PRESCALER             0                                          /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            4                 /**< Maximum number of simultaneously created timers. */
@@ -492,6 +458,12 @@ int main(void)
 //	sd_power_dcdc_mode_set  ( NRF_POWER_DCDC_ENABLE);
 		sd_role_enable(BLE_GAP_ROLE_CENTRAL);
 		timers_init();
+		pstorage_module_param_t		 param;
+		pstorage_init();
+		param.block_size  = PSTORAGE_BLOCK_SIZE;                   //Select block size of 16 bytes
+		param.block_count =(1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
+		param.cb          = example_cb_handler;  								//Set the pstorage callback handler
+		err_code = pstorage_register(&param, &flash_base_handle);
 
 		NRF_GPIO->PIN_CNF[GTM900_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
 																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
@@ -505,20 +477,17 @@ int main(void)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
 		nrf_gpio_pin_clear(VCC5_power_pin);
 
-//AT45DB161 sleep down
-//	 	nrf_delay_ms(20);  //There must be 20ms waitting for AT45DB161 ready from power on.
-//		spi_base_address = spi_master_init(0, 0, 0);
-//		uint8_t spi_data[1]={0XB9};
-//    spi_master_tx_rx(spi_base_address, 1, (const uint8_t *)spi_data, spi_data);
-
 
 		nrf_gpio_pin_set(GTM900_power_pin);
 
 //						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
 						simple_uart_config(NULL, 23, NULL, 24, false);  // for GPS box PCB
-
-//		data_time_get();	
+    pstorage_block_id = 2;
 		gprs_gtm900();
+		send_string("AT+CIPSHUT\r\n","OK");
+		send_string("AT+CGATT=0\r\n","OK");
+		send_string("AT+CPOWD=1\r\n","POWER");
+
 		nrf_gpio_pin_clear(GTM900_power_pin);
 		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 
@@ -528,13 +497,7 @@ int main(void)
 					}
 	
 
-		pstorage_module_param_t		 param;
-		pstorage_init();
-		param.block_size  = PSTORAGE_BLOCK_SIZE;                   //Select block size of 16 bytes
-		param.block_count =(1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
-		param.cb          = example_cb_handler;  								//Set the pstorage callback handler
-		err_code = pstorage_register(&param, &flash_base_handle);
-
+		pstorage_block_id = 0;
 		err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL) ;
 		APP_ERROR_CHECK(err_code);
 		for (;;)
@@ -552,7 +515,7 @@ int main(void)
 						if ((pstorage_block_id) && 
 								send_string("\r\n\x1a","OK")  &&
 								send_string("AT+CIPSEND\r\n",">") &&
-								send_string("\r\n\x2e\r\n\x1a","OK") &&
+								send_string("\r\n\x2e\r\n\x1a","250") &&
 								send_string("AT+CIPCLOSE=1\r\n","OK")) {};
 						send_string("AT+CIPSHUT\r\n","OK");
 						send_string("AT+CGATT=0\r\n","OK");
