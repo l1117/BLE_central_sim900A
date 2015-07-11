@@ -72,7 +72,7 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 
 void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
-    APPL_LOG("[APPL]: ASSERT: %s, %d, error 0x%08x\r\n", p_file_name, line_num, error_code);
+//    APPL_LOG("[APPL]: ASSERT: %s, %d, error 0x%08x\r\n", p_file_name, line_num, error_code);
 //						simple_uart_put( error_code);
 //						simple_uart_put( 0xEE);
 
@@ -248,14 +248,13 @@ void gprs_gtm900()
 					simple_uart_put(char_hex(tx_data[i-1]>>4));
 					simple_uart_put(char_hex(tx_data[i-1]));
 					if (!(i%LEN_record)){
-              if ((tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4]) == 0 ) break;
 							simple_uart_put('\r');
 							simple_uart_put('\n');
+              if ((tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4]) == 0 ) break;
 								if (i==512 || i==1024) {
 										send_string("\x1a","OK");	
 										if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
 										while(simple_uart_get_with_timeout(1,rx_data));
-
 										}
 							}
 				}
@@ -282,9 +281,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     {
         case BLE_GAP_EVT_ADV_REPORT:
         {
-				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[5] == 0x81 ) 
-							&& (p_gap_evt->params.adv_report.dlen>3) 
-							&& (rx_count+LEN_record)<MAX_rx_count)
+				if ((p_gap_evt->params.adv_report.scan_rsp) 
+								&& (p_gap_evt->params.adv_report.dlen>3) 
+								&& (p_ble_evt->evt.gap_evt.params.adv_report.data[2] == 0x81 ) 
+								&& ((rx_count+LEN_record)<MAX_rx_count))
 					{
 						for (uint8_t i=6;i>0;i--){ 						
 //							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
@@ -292,9 +292,8 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 							}
 //						for (uint8_t i=5;i<27;i++)     //27 is ADV data length
 						for (uint8_t i=5;i < p_gap_evt->params.adv_report.dlen;i++)     //27 is ADV data length
-
 							{	
-							tx_data[rx_count+i-5]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
+								tx_data[rx_count+i-5]=p_gap_evt->params.adv_report.data[i];
 //							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
 							}
 							rx_count+=22;
@@ -385,7 +384,7 @@ static void weakup_meantimeout_handler(void * p_context)
 				pstorage_block_id++ ;
 				}
 		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
-//		if ((time_period_count >= 3600) && (pstorage_block_id ))	{
+//		if ((pstorage_block_id )>500)	{
 				weakup_flag = true ;
 			}
 }
@@ -412,16 +411,20 @@ static void weakup_timeout_handler(void * p_context)
 
 //						sd_role_enable(BLE_GAP_ROLE_CENTRAL);
 
-						m_scan_param.active       = 0;            // Active scanning set.
+						m_scan_param.active       = 1;            // Active scanning set.
 						m_scan_param.selective    = 0;            // Selective scanning not set.
-						m_scan_param.interval     = 0x10A0;     // Scan interval.
-						m_scan_param.window       = 0x109E;   // Scan window.
+//						m_scan_param.interval     = 0x10A0;     // Scan interval.
+//						m_scan_param.window       = 0x109E;   // Scan window.
+						m_scan_param.interval     = 0x00A0;     // Scan interval.
+						m_scan_param.window       = 0x0050;   // Scan window.
+
 						m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
 						m_scan_param.timeout      = 0x0000;       // No timeout.
 						 err_code = sd_ble_gap_scan_stop();
 						 err_code = sd_ble_gap_scan_start(&m_scan_param);
 						APP_ERROR_CHECK(err_code);
-						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
+//						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
+						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(2010, 0), NULL);
 				//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
 				//		simple_uart_config(NULL, 8, NULL, 9, false);
 		} else if (time_period_count > 3600) weakup_flag = true;
@@ -476,14 +479,12 @@ int main(void)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
-		NRF_GPIO->PIN_CNF[VCC5_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
-																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
-		nrf_gpio_pin_clear(VCC5_power_pin);
-
-
+//		NRF_GPIO->PIN_CNF[VCC5_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
+//																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
+//																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
+//																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
+//																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+//		nrf_gpio_pin_clear(VCC5_power_pin);
 		nrf_gpio_pin_set(GTM900_power_pin);
 
 //						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
