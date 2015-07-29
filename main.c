@@ -36,13 +36,13 @@ static app_timer_id_t  					weakup_meantimer_id	;
 //static app_timer_id_t  					sim900a_timer_id	;
 #define APPL_LOG                        app_trace_log             /**< Debug logger macro that will be used in this file to do logging of debug information over UART. */
 #define MAX_rx_count 1024
-#define LEN_record 32
+#define LEN_record   32
 //#define GTM900_power_pin 4
 //#define GTM900_power_pin 8    //for GPS box PCB old Version PCB
 #define GTM900_power_pin 18    //for GPS box PCB
-#define VCC5_power_pin 8       //for GPS box PCB
-#define TIME_PERIOD 300       //seconds
-#define PSTORAGE_BLOCK_SIZE   1024   //  32 
+#define LED_PIN 22       //for GPS box PCB
+#define TIME_PERIOD 16   //300       //seconds
+#define PSTORAGE_BLOCK_SIZE   32 
 #define SCAN_TIMER_STAR    app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL)
 #define SCAN_TIMER_STOP    app_timer_stop(weakup_timer_id)
 
@@ -203,7 +203,7 @@ void gprs_gtm900()
 
 
 			send_string("AT+CREG?\r\n","OK");
-
+			nrf_gpio_pin_set(LED_PIN);
 			char s,subject[40];
 			for(s=3;s<27;s++) subject[s]=rx_data[s];
 //			battery_start(4);
@@ -214,8 +214,9 @@ void gprs_gtm900()
 			subject[30]=char_hex((pstorage_block_id>>4));
 			subject[31]=char_hex(pstorage_block_id);
 //			battery_start(6);
-			battery_start(ADC_CONFIG_PSEL_AnalogInput5);
-			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1600;
+			battery_start(ADC_CONFIG_PSEL_AnalogInput3);
+			nrf_gpio_pin_clear(LED_PIN);
+			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1800;
 			subject[32]=';';
 			subject[33]=char_hex(batt_lvl_in_milli_volts>>12);
 			subject[34]=char_hex((batt_lvl_in_milli_volts>>8));
@@ -269,6 +270,27 @@ void gprs_gtm900()
 					}
 			else return;
 }
+static void scan_stop_flash_write(void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+		uint32_t err_code;
+
+		err_code = sd_ble_gap_scan_stop();
+//		if (tx_data[0] || tx_data[1] || tx_data[2] || tx_data[3] || tx_data[4]){
+//		if (rx_count){
+//				pstorage_handle_t 		flash_handle;
+//				pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
+//				err_code = pstorage_clear(&flash_handle,1024);
+//				APP_ERROR_CHECK(err_code);
+//				err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
+//				APP_ERROR_CHECK(err_code);
+//				pstorage_block_id++ ;
+//				}
+		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+//		if ((time_period_count >= 3600) && (pstorage_block_id ))	{
+				weakup_flag = true ;
+			}
+}
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
@@ -282,39 +304,48 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     {
         case BLE_GAP_EVT_ADV_REPORT:
         {
-				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[5] == 0x81 ) 
-							&& (p_gap_evt->params.adv_report.dlen>3) 
-							&& (rx_count+LEN_record)<MAX_rx_count)
+				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[2]) == 0x81 && 
+						(p_ble_evt->evt.gap_evt.params.adv_report.data[3]) == 0x58 && 
+				  		(p_ble_evt->evt.gap_evt.params.adv_report.scan_rsp )   &&
+							(p_gap_evt->params.adv_report.dlen>3) )
 					{
 						for (uint8_t i=6;i>0;i--){ 						
 //							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
-							tx_data[rx_count++]=p_gap_evt->params.adv_report.peer_addr.addr[i-1];
+							tx_data[8-i]=p_gap_evt->params.adv_report.peer_addr.addr[i-1];
 							}
-//						for (uint8_t i=5;i<27;i++)     //27 is ADV data length
-						for (uint8_t i=5;i < p_gap_evt->params.adv_report.dlen;i++)     //27 is ADV data length
+						for (uint8_t i=4;i < p_gap_evt->params.adv_report.dlen;i++)     //27 is ADV data length
 
 							{	
-							tx_data[rx_count+i-5]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
+							tx_data[i+4]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
 //							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
 							}
-							rx_count+=22;
-						 *((uint32_t*)(tx_data+rx_count)) = timer_counter;
-							rx_count+=4;
-//						simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.rssi);
-							
-//						pstorage_handle_t 		flash_handle;	
-//						pstorage_block_identifier_get(&flash_base_handle,pstorage_block_id, &flash_handle);
-//						if (!(flash_handle.block_id % 1024)) {
-//								pstorage_clear_nextpage = 1;
-//							}
-//						err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 32, 0);
-//						APP_ERROR_CHECK(err_code);
-//						pstorage_block_id++ ;
-//						rx_count = 0;
-						
+						  tx_data[0] = p_ble_evt->evt.gap_evt.params.adv_report.rssi;
+//				  	 *(uint32_t *)(tx_data + 8) = 0xf000000+  //timer_counter
+//											*(uint32_t *)(tx_data+8) - *(uint32_t *)(tx_data + 12);
+							for (uint8_t i = 0 ; i <32 ; i++) simple_uart_put( tx_data[i]);
+
+							pstorage_handle_t 		flash_handle;
+							err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id++ , &flash_handle);
+							APP_ERROR_CHECK(err_code);
+							err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data,PSTORAGE_BLOCK_SIZE  , 0);
+							APP_ERROR_CHECK(err_code);
+							if (pstorage_block_id == (PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS)
+														scan_stop_flash_write(NULL);
+							else if (!(pstorage_block_id % (PSTORAGE_FLASH_PAGE_SIZE/PSTORAGE_BLOCK_SIZE))) {
+										err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
+										err_code = pstorage_clear(&flash_handle,PSTORAGE_FLASH_PAGE_SIZE);
+										APP_ERROR_CHECK(err_code);
+							}
+
 						}
 					break;
 					}
+        case BLE_GAP_EVT_TIMEOUT:
+						{
+            if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_SCAN) 
+											scan_stop_flash_write(NULL);
+							break;
+							}
 				default:
 						break;
 			}
@@ -365,32 +396,6 @@ static void sd_role_enable(uint8_t sd_role)
 		APP_ERROR_CHECK(err_code);
 }
 
-static void weakup_meantimeout_handler(void * p_context)
-{
-    UNUSED_PARAMETER(p_context);
-		uint32_t err_code;
-
-		err_code = sd_ble_gap_scan_stop();
-//    APP_ERROR_CHECK(err_code);
-//		pstorage_access_status_get(&pstorage_count);
-
-//		sd_role_enable(BLE_GAP_ROLE_PERIPH);
-		if (tx_data[0] || tx_data[1] || tx_data[2] || tx_data[3] || tx_data[4]){
-				pstorage_handle_t 		flash_handle;
-				pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
-				err_code = pstorage_clear(&flash_handle,1024);
-				APP_ERROR_CHECK(err_code);
-				err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
-				APP_ERROR_CHECK(err_code);
-				pstorage_block_id++ ;
-				}
-		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
-//		if ((time_period_count >= 3600) && (pstorage_block_id ))	{
-				weakup_flag = true ;
-			}
-}
-
-
 
 static void weakup_timeout_handler(void * p_context)
 {		
@@ -405,23 +410,23 @@ static void weakup_timeout_handler(void * p_context)
 ////		battery_start(6);
 		battery_start(ADC_CONFIG_PSEL_AnalogInput5);
 		uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
-    if (batt_lvl_in_milli_volts + 1600 < 3700 ){
-							return;
-						}
-		if (pstorage_block_id<(PSTORAGE_MAX_APPLICATIONS-1)) {
+//    if (batt_lvl_in_milli_volts + 1600 < 3700 ){
+//							return;
+//						}
+		if (pstorage_block_id<(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS) {
 
 //						sd_role_enable(BLE_GAP_ROLE_CENTRAL);
 
-						m_scan_param.active       = 0;            // Active scanning set.
+						m_scan_param.active       = 1;            // Active scanning set.
 						m_scan_param.selective    = 0;            // Selective scanning not set.
-						m_scan_param.interval     = 0x10A0;     // Scan interval.
-						m_scan_param.window       = 0x109E;   // Scan window.
+						m_scan_param.interval     = 20;     //0x10A0;     // Scan interval. in 0.625ms unit
+						m_scan_param.window       = 18;     //0x109E;   // Scan window.
 						m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
-						m_scan_param.timeout      = 0x0000;       // No timeout.
+						m_scan_param.timeout      = 0x0002;       // in seconds
 						 err_code = sd_ble_gap_scan_stop();
 						 err_code = sd_ble_gap_scan_start(&m_scan_param);
 						APP_ERROR_CHECK(err_code);
-						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
+//						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
 				//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
 				//		simple_uart_config(NULL, 8, NULL, 9, false);
 		} else if (time_period_count > 3600) weakup_flag = true;
@@ -445,15 +450,11 @@ static void timers_init(void)
 																	APP_TIMER_MODE_REPEATED,
 																	weakup_timeout_handler);
 			APP_ERROR_CHECK(err_code);
-			err_code = app_timer_create(&weakup_meantimer_id,
-																	APP_TIMER_MODE_SINGLE_SHOT,
-																	weakup_meantimeout_handler);
-			APP_ERROR_CHECK(err_code);
+//			err_code = app_timer_create(&weakup_meantimer_id,
+//																	APP_TIMER_MODE_SINGLE_SHOT,
+//																	weakup_meantimeout_handler);
+//			APP_ERROR_CHECK(err_code);
 
-//			err_code = app_timer_create(&sim900a_timer_id,
-//																	APP_TIMER_MODE_REPEATED,
-//																	sim900a_timeout_handler);
-//			err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL);
 }
 
 
@@ -463,44 +464,53 @@ int main(void)
 //	sd_power_dcdc_mode_set  ( NRF_POWER_DCDC_MODE_ON);
 //	sd_power_dcdc_mode_set  ( NRF_POWER_DCDC_ENABLE);
 		sd_role_enable(BLE_GAP_ROLE_CENTRAL);
+    ble_gap_addr_t  	p_addr;
+    sd_ble_gap_address_get	(	&p_addr	);
+		p_addr.addr [0] = 0x58;
+		p_addr.addr [1] = 0x81;
+    err_code = sd_ble_gap_address_set	(	BLE_GAP_ADDR_CYCLE_MODE_NONE, &p_addr	);
+		APP_ERROR_CHECK(err_code);
 		timers_init();
 		pstorage_module_param_t		 param;
 		pstorage_init();
 		param.block_size  = PSTORAGE_BLOCK_SIZE;                   //Select block size of 16 bytes
-		param.block_count =(1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
+		param.block_count =(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
 		param.cb          = example_cb_handler;  								//Set the pstorage callback handler
 		err_code = pstorage_register(&param, &flash_base_handle);
+		APP_ERROR_CHECK(err_code);
+		err_code = pstorage_clear(&flash_base_handle, PSTORAGE_FLASH_PAGE_SIZE);
+		APP_ERROR_CHECK(err_code);
+//							err_code = pstorage_store(&flash_base_handle, (uint8_t * )&tx_data, PSTORAGE_BLOCK_SIZE , 0);
+//							APP_ERROR_CHECK(err_code);
 
 		NRF_GPIO->PIN_CNF[GTM900_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
 																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
-		NRF_GPIO->PIN_CNF[VCC5_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
+		NRF_GPIO->PIN_CNF[LED_PIN] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
 																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
-		nrf_gpio_pin_clear(VCC5_power_pin);
+		nrf_gpio_pin_clear(LED_PIN);
+//		nrf_gpio_pin_set(GTM900_power_pin);
+////						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
+//						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
+						simple_uart_config(NULL, 10, NULL, 11, false);  // for GPS box PCB
+//    pstorage_block_id = 2;
+//		gprs_gtm900();
+//		send_string("AT+CIPSHUT\r\n","OK");
+//		send_string("AT+CGATT=0\r\n","OK");
+//		send_string("AT+CPOWD=1\r\n","POWER");
 
+//		nrf_gpio_pin_clear(GTM900_power_pin);
+//		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 
-		nrf_gpio_pin_set(GTM900_power_pin);
-
-//						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
-						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
-    pstorage_block_id = 2;
-		gprs_gtm900();
-		send_string("AT+CIPSHUT\r\n","OK");
-		send_string("AT+CGATT=0\r\n","OK");
-		send_string("AT+CPOWD=1\r\n","POWER");
-
-		nrf_gpio_pin_clear(GTM900_power_pin);
-		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
-
-		if (!timer_counter) {
-					nrf_delay_ms(10000);
-					NVIC_SystemReset();
-					}
+//		if (!timer_counter) {
+//					nrf_delay_ms(10000);
+//					NVIC_SystemReset();
+//					}
 	
 
 		pstorage_block_id = 0;
@@ -510,25 +520,28 @@ int main(void)
 			{
 				if (weakup_flag){
 						time_period_count = 0;
-						nrf_gpio_pin_clear(GTM900_power_pin);
-						nrf_delay_ms(100);
-						nrf_gpio_pin_set(GTM900_power_pin);
+//						nrf_gpio_pin_clear(GTM900_power_pin);
+//						nrf_delay_ms(100);
+//						nrf_gpio_pin_set(GTM900_power_pin);
 
-						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-//						simple_uart_config(NULL, 8, NULL, 9, false);
-						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
-						gprs_gtm900();
-						if ((pstorage_block_id) && 
-								send_string("\r\n\x1a","OK")  &&
-								send_string("AT+CIPSEND\r\n",">") &&
-								send_string("\r\n\x2e\r\n\x1a","250") &&
-								send_string("AT+CIPCLOSE=1\r\n","OK")) {};
-						send_string("AT+CIPSHUT\r\n","OK");
-						send_string("AT+CGATT=0\r\n","OK");
-						send_string("AT+CPOWD=1\r\n","POWER");
-						nrf_gpio_pin_clear(GTM900_power_pin);
-						NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+//						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+////						simple_uart_config(NULL, 8, NULL, 9, false);
+//						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
+//						gprs_gtm900();
+//						if ((pstorage_block_id) && 
+//								send_string("\r\n\x1a","OK")  &&
+//								send_string("AT+CIPSEND\r\n",">") &&
+//								send_string("\r\n\x2e\r\n\x1a","250") &&
+//								send_string("AT+CIPCLOSE=1\r\n","OK")) {};
+//						send_string("AT+CIPSHUT\r\n","OK");
+//						send_string("AT+CGATT=0\r\n","OK");
+//						send_string("AT+CPOWD=1\r\n","POWER");
+//						nrf_gpio_pin_clear(GTM900_power_pin);
+//						NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 						weakup_flag = false ;
+						pstorage_block_id=0;     //test should be delete!
+						err_code = pstorage_clear(&flash_base_handle,PSTORAGE_FLASH_PAGE_SIZE);
+
 						}
 				err_code = sd_app_evt_wait();
 				APP_ERROR_CHECK(err_code);    
