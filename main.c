@@ -41,7 +41,7 @@ static app_timer_id_t  					weakup_meantimer_id	;
 //#define GTM900_power_pin 8    //for GPS box PCB old Version PCB
 #define GTM900_power_pin 18    //for GPS box PCB
 #define LED_PIN 22       //for GPS box PCB
-#define TIME_PERIOD 16   //300       //seconds
+#define TIME_PERIOD     1    //180   //300       //seconds
 #define PSTORAGE_BLOCK_SIZE   32 
 #define SCAN_TIMER_STAR    app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL)
 #define SCAN_TIMER_STOP    app_timer_stop(weakup_timer_id)
@@ -52,10 +52,8 @@ static uint32_t *spi_base_address;
 static uint32_t timer_counter=0;
 static uint32_t time_period_count = 0;
 static uint16_t rx_count=0;
-static uint16_t month_days[12]={0,31,31+28,31+28+31,31+28+31+30,31+28+31+30+31,
-										31+28+31+30+31+30,31+28+31+30+31+30+31,31+28+31+30+31+30+31+31,
-										31+28+31+30+31+30+31+31+30,31+28+31+30+31+30+31+31+30+31,
-										31+28+31+30+31+30+31+31+30+31+30};
+static uint16_t month_days[12]={365+0, 365+31, 365+60, 365+91, 365+121, 365+152,
+				365+182, 212, 243, 273, 304, 334};
 
 static pstorage_handle_t       flash_base_handle;
 static pstorage_block_t pstorage_wait_handle = 0;
@@ -104,7 +102,7 @@ bool send_string(char * S,char * Respond)
    bool ret = false;
 	uint8_t Rcount=0;  
 	 while (* (Respond+Rcount)) Rcount++;
-		Rcount--;
+//		Rcount--;
 	
 //		Respond-=2;
 //	 char * SR; 
@@ -137,8 +135,8 @@ bool send_string(char * S,char * Respond)
 }
 
  char char_hex( char bHex){
-		bHex&=0x0f;
-    if((bHex<10))
+		bHex &= 0x0f;
+    if((bHex < 10))
         bHex += '0';
     else bHex += 'A'-10;
 //    else bHex = 0xff;
@@ -149,14 +147,29 @@ void gprs_gtm900()
 {
 //GTM900C 
 //		simple_uart_config(NULL, 8, NULL, 9, false);
+			nrf_delay_ms(20000);
+			char s,subject[80]= "DTU@",sub_index=4;
+			send_string("AT\r\n","OK");
 			send_string("AT\r\n","OK");
 			send_string("AT\r\n","OK");
 			send_string("ATE1\r\n","OK");
+			if (!send_string("at+CLTS?\r\n","CLTS: 1")) {
+					send_string("at+CLTS=1\r\n","OK");
+					send_string("AT&W\r\n","OK");
+					return;
+					}
 			if(!send_string("AT+CPIN?\r\n","READY")) return; //error
-
-			send_string("AT+CLTS=1\r\n","OK");  //Get date time.
-			if ((send_string("","DST:")||send_string("","DST:"))	
-						&& send_string("AT+CCLK?\r\n","OK") && (rx_data[21]=='1' && rx_data[22]>='5')){
+			send_string("AT+CREG=2\r\n","OK");
+			if (!send_string("AT+CREG?\r\n","+CREG: 2,1")) send_string("AT+CREG?\r\n","+CREG: 2,1");
+			for (uint8_t i = 32; i <36; i++) subject[sub_index++]= rx_data[i];
+			for (uint8_t i = 39; i <43; i++) subject[sub_index++]= rx_data[i];
+			send_string("AT+CREG=0\r\n","OK");
+			send_string("at+csq\r\n","OK");  	//信号质量
+					for (uint8_t i = 11; i <21; i++) subject[sub_index++]= rx_data[i];
+			send_string("at+cbc\r\n","OK");  	
+					for (uint8_t i = 11; i <26; i++) subject[sub_index++]= rx_data[i];
+				if (send_string("AT+CCLK?\r\n","OK") && (rx_data[21]=='1' && rx_data[22]>='5')){
+					for (uint8_t i = 20; i <42; i++) subject[sub_index++]= rx_data[i];
 					rx_data[24] = (rx_data[24]-'0')*10 + (rx_data[25]-'0');  	//month
 					rx_data[27] = (rx_data[27]-'0')*10 + (rx_data[28]-'0');		//day
 					rx_data[30] = (rx_data[30]-'0')*10 + (rx_data[31]-'0');		//hour
@@ -164,22 +177,16 @@ void gprs_gtm900()
 					rx_data[36] = (rx_data[36]-'0')*10 + (rx_data[37]-'0');		//second
 					timer_counter = ((((month_days[rx_data[24]-1]+rx_data[27])*24 + rx_data[30])*60 + rx_data[33])*60 + rx_data[36]);
 					}
-			send_string("AT+CLTS=0\r\n","OK");  //Get date time.
 			send_string("ATE0\r\n","OK");
-
-
-			send_string("at+csq\r\n","OK");  	//信号质量
-//			send_string("at%ipclose=1\r\n","OK");
-			if (!send_string("at+cgatt=1\r\n","OK")) return;
-			send_string("AT+CIPCSGP=1,\"cmnet\",\"guest\",\"guest\"\r\n","OK");
-
-			send_string("at+CSTT\r\n","OK");
+////			send_string("at%ipclose=1\r\n","OK");
+			if (!send_string("at+cgatt?\r\n","CGATT: 1")) 
+							send_string("at+cgatt=1\r\n","OK");
+//			send_string("AT+CIPCSGP=1,\"cmnet\",\"guest\",\"guest\"\r\n","OK");
+			send_string("at+CSTT=\"CMNET\"\r\n","OK");
 			send_string("AT+CIICR\r\n","OK");
-
 			send_string("AT+CIFSR\r\n",".");
-			send_string("AT+CIPCLOSE=1\r\n","OK");
-
-			if(!(send_string("AT+CIPSTART=\"TCP\",\"159.226.251.11\",25\r\n","220")||send_string("","220"))) return;
+//			send_string("AT+CIPCLOSE=1\r\n","OK");
+			if(!(send_string("AT+CIPSTART=\"TCP\",\"159.226.251.11\",25\r\n","CONNECT OK")||send_string("","CONNECT OK"))) return;
 
 //send mail
 			send_string("AT+CIPSPRT=1\r\n","OK");
@@ -195,74 +202,43 @@ void gprs_gtm900()
 			send_string("AT+CIPSEND\r\n",">");		
 			send_string("MAIL FROM:<lye@cstnet.cn>\r\n\x1a","250");//mail from lye@cstnet.cn
 			send_string("AT+CIPSEND\r\n",">");		
-			send_string("RCPT to:<ccdc@cstnet.cn>\r\n\x1a","250");//RCPT to:<ccdc@cstnet.cn>
+//			send_string("RCPT to:<ccdc@cstnet.cn>\r\n\x1a","250");//RCPT to:<ccdc@cstnet.cn>
+			send_string("RCPT to:<lye@cstnet.cn>\r\n\x1a","250");//RCPT to:<ccdc@cstnet.cn>
 			send_string("AT+CIPSEND\r\n",">");		
 			if(!send_string("DATA\r\n\x1a","354")) return;//DATA
-
-			send_string("AT+CREG=2\r\n","OK");
-
-
-			send_string("AT+CREG?\r\n","OK");
-			nrf_gpio_pin_set(LED_PIN);
-			char s,subject[40];
-			for(s=3;s<27;s++) subject[s]=rx_data[s];
-//			battery_start(4);
-//			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
-			subject[27]=';';
-			subject[28]=char_hex(pstorage_block_id>>12);
-			subject[29]=char_hex((pstorage_block_id>>8));
-			subject[30]=char_hex((pstorage_block_id>>4));
-			subject[31]=char_hex(pstorage_block_id);
-//			battery_start(6);
-			battery_start(ADC_CONFIG_PSEL_AnalogInput3);
-			nrf_gpio_pin_clear(LED_PIN);
-			uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 + 1800;
-			subject[32]=';';
-			subject[33]=char_hex(batt_lvl_in_milli_volts>>12);
-			subject[34]=char_hex((batt_lvl_in_milli_volts>>8));
-			subject[35]=char_hex((batt_lvl_in_milli_volts>>4));
-			subject[36]=char_hex(batt_lvl_in_milli_volts);
-
 			send_string("AT+CIPSEND\r\n",">");		
-
-
 			send_string_no_answer("Subject: ");//Subject: 
-
-			for (uint8_t i=3;i<37;i++) {
+			for (uint8_t i=0;i<59;i++) {
 					simple_uart_put((subject[i]));//+CREG: 2,1,"11D4","2048"
 					}
 
 			send_string("\r\n\r\n\x1a","OK");
-			send_string("AT+CREG=0\r\n","OK");
+//			send_string("AT+CREG=0\r\n","OK");
 			send_string("AT+CIPSEND\r\n",">");
 //			send_string("AT+CIPSEND?\r\n","OK");
 //		for (uint16_t block_id=0; block_id<(1024 / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS; block_id++){
-		for (uint16_t block_id = 0; block_id <= (pstorage_block_id-1); block_id++){
+		for (uint16_t block_id = 0; block_id < pstorage_block_id; block_id++){
 //send data area
-						pstorage_handle_t 		flash_handle;
-						pstorage_block_identifier_get(&flash_base_handle, block_id, &flash_handle);
-						uint16_t err_code = 0;
-						err_code = pstorage_load((uint8_t *)tx_data, &flash_handle,1024,0);
-						APP_ERROR_CHECK(err_code);
-			while(simple_uart_get_with_timeout(1,rx_data));
-			for (uint16_t i=1; i <= MAX_rx_count; i++){
-					simple_uart_put(char_hex(tx_data[i-1]>>4));
-					simple_uart_put(char_hex(tx_data[i-1]));
-					if (!(i%LEN_record)){
-              if ((tx_data[i-1] | tx_data[i-2] | tx_data[i-3] | tx_data[i-4]) == 0 ) break;
-							simple_uart_put('\r');
-							simple_uart_put('\n');
-								if (i==512 || i==1024) {
-										send_string("\x1a","OK");	
-										if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
-										while(simple_uart_get_with_timeout(1,rx_data));
-
-										}
-							}
-				}
-			send_string("\r\n\x1a","OK");	
-			if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
-			while(simple_uart_get_with_timeout(1,rx_data));
+				pstorage_handle_t 		flash_handle;
+				pstorage_block_identifier_get(&flash_base_handle, block_id, &flash_handle);
+				uint16_t err_code = 0;
+				err_code = pstorage_load((uint8_t *)tx_data, &flash_handle,1024,0);
+				APP_ERROR_CHECK(err_code);
+				while(simple_uart_get_with_timeout(1,rx_data));
+				for (uint16_t i=0; i < 512; i++){
+						simple_uart_put(char_hex(tx_data[i]>>4));
+						simple_uart_put(char_hex(tx_data[i]));
+					}
+				send_string("\r\n\x1a","OK");	
+				if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
+				while(simple_uart_get_with_timeout(1,rx_data));
+				for (uint16_t i=512; i < 1024; i++){
+						simple_uart_put(char_hex(tx_data[i]>>4));
+						simple_uart_put(char_hex(tx_data[i]));
+					}
+				send_string("\r\n\x1a","OK");	
+				if (!send_string("AT+CIPSEND\r\n",">")) if (!send_string("AT+CIPSEND\r\n",">")) return;	
+				while(simple_uart_get_with_timeout(1,rx_data));
 			}
 			if (send_string("\r\n\x2e\r\n\x1a","250")) {
 							pstorage_block_id = 0;
@@ -270,33 +246,33 @@ void gprs_gtm900()
 					}
 			else return;
 }
-static void scan_stop_flash_write(void * p_context)
-{
-    UNUSED_PARAMETER(p_context);
-		uint32_t err_code;
+//static void scan_stop_flash_write(void * p_context)
+//{
+//    UNUSED_PARAMETER(p_context);
+//		uint32_t err_code;
 
-		err_code = sd_ble_gap_scan_stop();
-//		if (tx_data[0] || tx_data[1] || tx_data[2] || tx_data[3] || tx_data[4]){
-//		if (rx_count){
-//				pstorage_handle_t 		flash_handle;
-//				pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
-//				err_code = pstorage_clear(&flash_handle,1024);
-//				APP_ERROR_CHECK(err_code);
-//				err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
-//				APP_ERROR_CHECK(err_code);
-//				pstorage_block_id++ ;
-//				}
-		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
-//		if ((time_period_count >= 3600) && (pstorage_block_id ))	{
-				weakup_flag = true ;
-			}
-}
+//		err_code = sd_ble_gap_scan_stop();
+////		if (tx_data[0] || tx_data[1] || tx_data[2] || tx_data[3] || tx_data[4]){
+////		if (rx_count){
+////				pstorage_handle_t 		flash_handle;
+////				pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
+////				err_code = pstorage_clear(&flash_handle,1024);
+////				APP_ERROR_CHECK(err_code);
+////				err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data, 1024, 0);
+////				APP_ERROR_CHECK(err_code);
+////				pstorage_block_id++ ;
+////				}
+////		if ((time_period_count > (3600*2)) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+//		if ((time_period_count >= 300) || (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+//				weakup_flag = true ;
+//			}
+//}
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     uint32_t           err_code;
     const ble_gap_evt_t   * p_gap_evt = &p_ble_evt->evt.gap_evt;
-
+		static uint8_t tx_id=0;
 //  	simple_uart_put( p_ble_evt->header.evt_id);
 //  	simple_uart_put( 0xFF);
 
@@ -306,44 +282,56 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
         {
 				if ((p_ble_evt->evt.gap_evt.params.adv_report.data[2]) == 0x81 && 
 						(p_ble_evt->evt.gap_evt.params.adv_report.data[3]) == 0x58 && 
-				  		(p_ble_evt->evt.gap_evt.params.adv_report.scan_rsp )   &&
-							(p_gap_evt->params.adv_report.dlen>3) )
+						((p_ble_evt->evt.gap_evt.params.adv_report.data[22]) != 0xFF) && 
+						((p_ble_evt->evt.gap_evt.params.adv_report.data[23]) != 0xFF) && 
+				  	(p_ble_evt->evt.gap_evt.params.adv_report.scan_rsp )   &&							
+						(p_gap_evt->params.adv_report.dlen>3) )
 					{
-						for (uint8_t i=6;i>0;i--){ 						
-//							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
-							tx_data[8-i]=p_gap_evt->params.adv_report.peer_addr.addr[i-1];
-							}
-						for (uint8_t i=4;i < p_gap_evt->params.adv_report.dlen;i++)     //27 is ADV data length
-
-							{	
-							tx_data[i+4]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
-//							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
-							}
-						  tx_data[0] = p_ble_evt->evt.gap_evt.params.adv_report.rssi;
+							for (uint8_t i=6;i>0;i--){ 						
+	//							simple_uart_put( p_gap_evt->params.adv_report.peer_addr.addr[i-1] );
+								tx_data[8-i+tx_id*32]=p_gap_evt->params.adv_report.peer_addr.addr[i-1];
+								}
+							for (uint8_t i=4;i < p_gap_evt->params.adv_report.dlen;i++)     //27 is ADV data length
+								{	
+								tx_data[i+4+tx_id*32]=p_ble_evt->evt.gap_evt.params.adv_report.data[i];
+	//							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
+								}
+						  tx_data[0+tx_id*32] = p_ble_evt->evt.gap_evt.params.adv_report.rssi;
 //				  	 *(uint32_t *)(tx_data + 8) = 0xf000000+  //timer_counter
 //											*(uint32_t *)(tx_data+8) - *(uint32_t *)(tx_data + 12);
-							for (uint8_t i = 0 ; i <32 ; i++) simple_uart_put( tx_data[i]);
+							*(uint32_t *)(tx_data + 8+tx_id*32) = timer_counter;
+							tx_id++;
+//							for (uint8_t i = 0 ; i <32 ; i++) simple_uart_put( tx_data[i]);
+							if (tx_id > 31) {
+									sd_ble_gap_scan_stop();
+									tx_id=0;
+									pstorage_handle_t 		flash_handle;
+									err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id++ , &flash_handle);
+									APP_ERROR_CHECK(err_code);
+									err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data,PSTORAGE_BLOCK_SIZE*32  , 0);
+									APP_ERROR_CHECK(err_code);
+									if (pstorage_block_id < PSTORAGE_MAX_APPLICATIONS){
+												flash_handle.block_id+=1024;
+												err_code = pstorage_clear(&flash_handle,PSTORAGE_FLASH_PAGE_SIZE);
+												APP_ERROR_CHECK(err_code);
+									}
+									if ((time_period_count >= 1800) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS/2)))	{
+												weakup_flag = true ;
+												time_period_count = 0;
+									}
 
-							pstorage_handle_t 		flash_handle;
-							err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id++ , &flash_handle);
-							APP_ERROR_CHECK(err_code);
-							err_code = pstorage_store(&flash_handle, (uint8_t * )&tx_data,PSTORAGE_BLOCK_SIZE  , 0);
-							APP_ERROR_CHECK(err_code);
-							if (pstorage_block_id == (PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS)
-														scan_stop_flash_write(NULL);
-							else if (!(pstorage_block_id % (PSTORAGE_FLASH_PAGE_SIZE/PSTORAGE_BLOCK_SIZE))) {
-										err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
-										err_code = pstorage_clear(&flash_handle,PSTORAGE_FLASH_PAGE_SIZE);
-										APP_ERROR_CHECK(err_code);
+								}
+							else {
+										app_timer_stop(weakup_meantimer_id);
+										app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
 							}
-
-						}
+					}
 					break;
 					}
         case BLE_GAP_EVT_TIMEOUT:
 						{
             if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_SCAN) 
-											scan_stop_flash_write(NULL);
+//											scan_stop_flash_write(NULL);
 							break;
 							}
 				default:
@@ -396,7 +384,11 @@ static void sd_role_enable(uint8_t sd_role)
 		APP_ERROR_CHECK(err_code);
 }
 
+static void weakup_meantimeout_handler(void)
+{
+		sd_ble_gap_scan_stop();
 
+}
 static void weakup_timeout_handler(void * p_context)
 {		
     UNUSED_PARAMETER(p_context);
@@ -404,33 +396,34 @@ static void weakup_timeout_handler(void * p_context)
 		timer_counter += TIME_PERIOD ;
 		time_period_count += TIME_PERIOD;
 		if (weakup_flag) return;
-		memset(tx_data,0,MAX_rx_count);
-		rx_count = 0;
+
+//		memset(tx_data,0,MAX_rx_count);
+//		rx_count = 0;
 		
-////		battery_start(6);
-		battery_start(ADC_CONFIG_PSEL_AnalogInput5);
-		uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
+//		battery_start(ADC_CONFIG_PSEL_AnalogInput5);
+//		uint16_t batt_lvl_in_milli_volts=(((NRF_ADC->RESULT) * 1200) / 255) * 3 ;
 //    if (batt_lvl_in_milli_volts + 1600 < 3700 ){
 //							return;
 //						}
-		if (pstorage_block_id<(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS) {
-
-//						sd_role_enable(BLE_GAP_ROLE_CENTRAL);
-
-						m_scan_param.active       = 1;            // Active scanning set.
-						m_scan_param.selective    = 0;            // Selective scanning not set.
-						m_scan_param.interval     = 20;     //0x10A0;     // Scan interval. in 0.625ms unit
-						m_scan_param.window       = 18;     //0x109E;   // Scan window.
-						m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
-						m_scan_param.timeout      = 0x0002;       // in seconds
-						 err_code = sd_ble_gap_scan_stop();
-						 err_code = sd_ble_gap_scan_start(&m_scan_param);
-						APP_ERROR_CHECK(err_code);
-//						app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(1010, 0), NULL);
-				//		NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-				//		simple_uart_config(NULL, 8, NULL, 9, false);
-		} else if (time_period_count > 3600) weakup_flag = true;
-	
+//		if (pstorage_block_id<(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS) {
+			if (pstorage_block_id < PSTORAGE_MAX_APPLICATIONS){
+						if (!(timer_counter % 16)){
+	//						sd_role_enable(BLE_GAP_ROLE_CENTRAL);
+							err_code = sd_ble_gap_scan_stop();
+							m_scan_param.active       = 1;            // Active scanning set.
+							m_scan_param.selective    = 0;            // Selective scanning not set.
+							m_scan_param.interval     = 0x4000;   //10;     //0x10A0;     // Scan interval. in 0.625ms unit
+							m_scan_param.window       = 0x3ffD;   //8;     //0x109E;   // Scan window.
+							m_scan_param.p_whitelist  = NULL;         // No whitelist provided.
+							m_scan_param.timeout      = 0;       // in seconds
+							err_code = sd_ble_gap_scan_start(&m_scan_param);
+							APP_ERROR_CHECK(err_code);
+							}
+					}		
+				else if (time_period_count > 600) {
+										weakup_flag = true;
+										time_period_count = 0;
+										}	
 }
 
 #define APP_TIMER_PRESCALER             0                                          /**< Value of the RTC1 PRESCALER register. */
@@ -450,10 +443,10 @@ static void timers_init(void)
 																	APP_TIMER_MODE_REPEATED,
 																	weakup_timeout_handler);
 			APP_ERROR_CHECK(err_code);
-//			err_code = app_timer_create(&weakup_meantimer_id,
-//																	APP_TIMER_MODE_SINGLE_SHOT,
-//																	weakup_meantimeout_handler);
-//			APP_ERROR_CHECK(err_code);
+			err_code = app_timer_create(&weakup_meantimer_id,
+																	APP_TIMER_MODE_SINGLE_SHOT,
+																	weakup_meantimeout_handler);
+			APP_ERROR_CHECK(err_code);
 
 }
 
@@ -473,12 +466,12 @@ int main(void)
 		timers_init();
 		pstorage_module_param_t		 param;
 		pstorage_init();
-		param.block_size  = PSTORAGE_BLOCK_SIZE;                   //Select block size of 16 bytes
-		param.block_count =(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
+//		param.block_size  = PSTORAGE_BLOCK_SIZE;                   //Select block size of 16 bytes
+//		param.block_count =(PSTORAGE_FLASH_PAGE_SIZE / PSTORAGE_BLOCK_SIZE) * PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
+		param.block_size  = 1024;                   //Select block size of 16 bytes
+		param.block_count = PSTORAGE_MAX_APPLICATIONS;    //Select 10 blocks, total of 160 bytes
 		param.cb          = example_cb_handler;  								//Set the pstorage callback handler
 		err_code = pstorage_register(&param, &flash_base_handle);
-		APP_ERROR_CHECK(err_code);
-		err_code = pstorage_clear(&flash_base_handle, PSTORAGE_FLASH_PAGE_SIZE);
 		APP_ERROR_CHECK(err_code);
 //							err_code = pstorage_store(&flash_base_handle, (uint8_t * )&tx_data, PSTORAGE_BLOCK_SIZE , 0);
 //							APP_ERROR_CHECK(err_code);
@@ -494,50 +487,59 @@ int main(void)
 																							| (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos)
 																							| (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
 		nrf_gpio_pin_clear(LED_PIN);
-//		nrf_gpio_pin_set(GTM900_power_pin);
+		nrf_gpio_pin_clear(GTM900_power_pin);
+		nrf_delay_ms(5000);
+		nrf_gpio_pin_set(GTM900_power_pin);
 ////						simple_uart_config(NULL, 2, NULL, 3, false);  // for GPS box PCB
 //						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
-						simple_uart_config(NULL, 10, NULL, 11, false);  // for GPS box PCB
-//    pstorage_block_id = 2;
-//		gprs_gtm900();
-//		send_string("AT+CIPSHUT\r\n","OK");
-//		send_string("AT+CGATT=0\r\n","OK");
-//		send_string("AT+CPOWD=1\r\n","POWER");
+//						simple_uart_config(NULL, 10, NULL, 11, false);  // for GPS box PCB
+						simple_uart_config(NULL, 16, NULL, 8, false);  // for GPS box PCB
+    pstorage_block_id = 2;
+		gprs_gtm900();
+		send_string("AT+CIPSHUT\r\n","OK");
+		send_string("AT+CGATT=0\r\n","OK");
+		send_string("AT+CPOWD=1\r\n","POWER");
 
-//		nrf_gpio_pin_clear(GTM900_power_pin);
-//		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+		nrf_gpio_pin_clear(GTM900_power_pin);
+		NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 
-//		if (!timer_counter) {
-//					nrf_delay_ms(10000);
-//					NVIC_SystemReset();
-//					}
-	
+//NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+//simple_uart_config(NULL, 16, NULL, 8, false);  // for GPS box PCB
 
+
+		if (!timer_counter) {
+					nrf_delay_ms(10000);
+					NVIC_SystemReset();
+					}
+		err_code = pstorage_clear(&flash_base_handle, PSTORAGE_FLASH_PAGE_SIZE);
+		APP_ERROR_CHECK(err_code);
 		pstorage_block_id = 0;
-		err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL) ;
+//		err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(TIME_PERIOD*1000, 0), NULL) ;
+		err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(1000, 0), NULL) ;
 		APP_ERROR_CHECK(err_code);
 		for (;;)
 			{
 				if (weakup_flag){
 						time_period_count = 0;
-//						nrf_gpio_pin_clear(GTM900_power_pin);
-//						nrf_delay_ms(100);
-//						nrf_gpio_pin_set(GTM900_power_pin);
+						nrf_gpio_pin_clear(GTM900_power_pin);
+						nrf_delay_ms(100);
+						nrf_gpio_pin_set(GTM900_power_pin);
 
-//						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
-////						simple_uart_config(NULL, 8, NULL, 9, false);
+						NRF_UART0->POWER = (UART_POWER_POWER_Enabled << UART_POWER_POWER_Pos);
+//						simple_uart_config(NULL, 8, NULL, 9, false);
 //						simple_uart_config(NULL, 24, NULL, 23, false);  // for GPS box PCB
-//						gprs_gtm900();
-//						if ((pstorage_block_id) && 
-//								send_string("\r\n\x1a","OK")  &&
-//								send_string("AT+CIPSEND\r\n",">") &&
-//								send_string("\r\n\x2e\r\n\x1a","250") &&
-//								send_string("AT+CIPCLOSE=1\r\n","OK")) {};
-//						send_string("AT+CIPSHUT\r\n","OK");
-//						send_string("AT+CGATT=0\r\n","OK");
-//						send_string("AT+CPOWD=1\r\n","POWER");
-//						nrf_gpio_pin_clear(GTM900_power_pin);
-//						NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
+						simple_uart_config(NULL, 16, NULL, 8, false);  // for GPS box PCB
+						gprs_gtm900();
+						if ((pstorage_block_id) && 
+								send_string("\r\n\x1a","OK")  &&
+								send_string("AT+CIPSEND\r\n",">") &&
+								send_string("\r\n\x2e\r\n\x1a","250") &&
+								send_string("AT+CIPCLOSE=1\r\n","OK")) {};
+						send_string("AT+CIPSHUT\r\n","OK");
+						send_string("AT+CGATT=0\r\n","OK");
+						send_string("AT+CPOWD=1\r\n","POWER");
+						nrf_gpio_pin_clear(GTM900_power_pin);
+						NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 						weakup_flag = false ;
 						pstorage_block_id=0;     //test should be delete!
 						err_code = pstorage_clear(&flash_base_handle,PSTORAGE_FLASH_PAGE_SIZE);
