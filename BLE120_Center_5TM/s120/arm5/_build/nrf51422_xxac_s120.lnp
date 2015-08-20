@@ -3,6 +3,7 @@
 ".\_build\battery.o"
 ".\_build\spi_master.o"
 ".\_build\simple_uart.o"
+".\_build\ble_radio_notification.o"
 ".\_build\arm_startup_nrf51.o"
 ".\_build\system_nrf51.o"
 ".\_build\ble_db_discovery.o"

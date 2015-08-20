@@ -424,6 +424,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\simple_uart.c</FilePath>
             </File>
+            <File>
+              <FileName>ble_radio_notification.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\components\ble\ble_radio_notification\ble_radio_notification.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -835,6 +840,18 @@
           <targetInfo name="nrf51422_xxac_s120"/>
         </targetInfos>
       </file>
+      <file attr="config" category="source" name="ble_radio_notification\ble_radio_notification.c" version="2.0.0">
+        <instance index="0" removed="1">RTE\nRF_BLE\nRF51822_xxAA\ble_radio_notification.c</instance>
+        <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_radio_notification" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_radio_notification"/>
+        <package name="nRF_BLE" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/" vendor="NordicSemiconductor" version="2.0.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="header" name="ble_radio_notification\ble_radio_notification.h" version="2.0.0">
+        <instance index="0" removed="1">RTE\nRF_BLE\nRF51822_xxAA\ble_radio_notification.h</instance>
+        <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="ble_radio_notification" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="ble_radio_notification"/>
+        <package name="nRF_BLE" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_BLE/" vendor="NordicSemiconductor" version="2.0.0"/>
+        <targetInfos/>
+      </file>
       <file attr="config" category="header" name="device_manager\config\device_manager_cnfg.h" version="2.0.0">
         <instance index="0">RTE\nRF_BLE\nRF51822_xxAA\device_manager_cnfg.h</instance>
         <component Cclass="nRF_BLE" Cgroup="BLE_Modules" Csub="device_manager" Cvariant="Central" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="device_manager_Central"/>
@@ -894,10 +911,10 @@
         <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="2.0.0"/>
         <targetInfos/>
       </file>
-      <file attr="config" category="source" name="nrf_soc_nosd\nrf_soc.c">
+      <file attr="config" category="source" name="nrf_soc_nosd\nrf_soc.c" version="2.0.0">
         <instance index="0" removed="1">RTE\nRF_Drivers\nRF51822_xxAA\nrf_soc.c</instance>
-        <component Cclass="nRF_Drivers" Cgroup="nrf_soc" Cvariant="No_softdevice" Cvendor="NordicSemiconductor" Cversion="1.2.0" condition="nrf_soc_No_softdevice"/>
-        <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="1.2.0"/>
+        <component Cclass="nRF_Drivers" Cgroup="nrf_soc" Cvariant="No_softdevice" Cvendor="NordicSemiconductor" Cversion="2.0.0" condition="nrf_soc_No_softdevice"/>
+        <package name="nRF_Drivers" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Drivers/" vendor="NordicSemiconductor" version="2.0.0"/>
         <targetInfos/>
       </file>
       <file attr="config" category="source" name="pstorage\pstorage.c" version="2.0.0">
