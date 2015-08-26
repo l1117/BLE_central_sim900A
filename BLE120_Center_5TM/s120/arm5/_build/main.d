@@ -31,8 +31,6 @@
 .\_build\main.o: C:\Users\l1117\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_trace.h
 .\_build\main.o: ..\..\..\simple_uart.h
 .\_build\main.o: C:\Users\l1117\Documents\GitHub\BLE_central_sim900A\BLE120_Center_5TM\s120\arm5\RTE\nRF_Libraries\nRF51822_xxAA\app_timer.h
-.\_build\main.o: ..\..\..\spi_master_old.h
-.\_build\main.o: ..\..\..\spi_master_config.h
 .\_build\main.o: ..\..\..\battery.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\2.0.0\headers\nrf_soc.h
 .\_build\main.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_SoftDevice_S120\2.0.0\headers\nrf_error_soc.h

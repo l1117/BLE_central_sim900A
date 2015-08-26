@@ -152,7 +152,7 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>90</LineNumber>
+          <LineNumber>87</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>120376</Address>
           <ByteObject>0</ByteObject>
@@ -367,10 +367,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>41</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>339</TopLine>
-      <CurrentLine>342</CurrentLine>
+      <TopLine>486</TopLine>
+      <CurrentLine>489</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -399,7 +399,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -417,8 +417,8 @@
       <Focus>0</Focus>
       <ColumnNumber>64</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>78</TopLine>
-      <CurrentLine>107</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\simple_uart.c</PathWithFileName>
       <FilenameWithoutPath>simple_uart.c</FilenameWithoutPath>
@@ -505,8 +505,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>128</TopLine>
-      <CurrentLine>160</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\Device\nRF51822_xxAA\arm_startup_nrf51.s</PathWithFileName>
       <FilenameWithoutPath>arm_startup_nrf51.s</FilenameWithoutPath>
@@ -647,10 +647,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>48</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>274</TopLine>
+      <CurrentLine>294</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_Drivers\nRF51822_xxAA\pstorage.c</PathWithFileName>
       <FilenameWithoutPath>pstorage.c</FilenameWithoutPath>
@@ -665,8 +665,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>67</TopLine>
+      <CurrentLine>76</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_Drivers\nRF51822_xxAA\pstorage.h</PathWithFileName>
       <FilenameWithoutPath>pstorage.h</FilenameWithoutPath>
@@ -679,10 +679,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>38</ColumnNumber>
+      <ColumnNumber>37</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>39</TopLine>
+      <CurrentLine>52</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>RTE\nRF_Drivers\nRF51822_xxAA\pstorage_platform.h</PathWithFileName>
       <FilenameWithoutPath>pstorage_platform.h</FilenameWithoutPath>

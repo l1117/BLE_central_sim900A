@@ -102,7 +102,7 @@ void battery_start(uint32_t AnalogInput)
                           (ADC_CONFIG_INPSEL_AnalogInputOneThirdPrescaling << ADC_CONFIG_INPSEL_Pos)  |
 //                          (ADC_CONFIG_INPSEL_SupplyOneThirdPrescaling << ADC_CONFIG_INPSEL_Pos)  |
                           (ADC_CONFIG_REFSEL_VBG                      << ADC_CONFIG_REFSEL_Pos)  |
-                          (AnalogInput                   << ADC_CONFIG_PSEL_Pos)    |
+                          (AnalogInput                                << ADC_CONFIG_PSEL_Pos)    |
                           (ADC_CONFIG_EXTREFSEL_None                  << ADC_CONFIG_EXTREFSEL_Pos);
     NRF_ADC->EVENTS_END = 0;
     NRF_ADC->ENABLE     = ADC_ENABLE_ENABLE_Enabled;
@@ -116,17 +116,19 @@ void battery_start(uint32_t AnalogInput)
 
 //    err_code = sd_nvic_EnableIRQ(ADC_IRQn);
 //    APP_ERROR_CHECK(err_code);
-
-    NRF_ADC->EVENTS_END  = 0;    // Stop any running conversions.
-    NRF_ADC->TASKS_START = 1;
-
-
-				uint8_t adc_delay=0;
-        while (!NRF_ADC->EVENTS_END && adc_delay<0xff)  adc_delay++;
-        batt_lvl_in_milli_volts = ADC_RESULT_IN_MILLI_VOLTS(NRF_ADC->RESULT); // + DIODE_FWD_VOLT_DROP_MILLIVOLTS;
-        NRF_ADC->TASKS_STOP     = 1;
-				NRF_ADC->ENABLE     = ADC_ENABLE_ENABLE_Disabled;
-
+			uint32_t p_is_running = 0; 
+			sd_clock_hfclk_request(); 
+			while(! p_is_running) {  							//wait for the hfclk to be available 
+					sd_clock_hfclk_is_running(&p_is_running); 
+			}                
+			NRF_ADC->EVENTS_END  = 0;    // Stop any running conversions.
+			NRF_ADC->TASKS_START = 1;
+			uint8_t adc_delay=0;
+			while (!NRF_ADC->EVENTS_END && adc_delay<0xff)  adc_delay++;
+			batt_lvl_in_milli_volts = ADC_RESULT_IN_MILLI_VOLTS(NRF_ADC->RESULT); // + DIODE_FWD_VOLT_DROP_MILLIVOLTS;
+			NRF_ADC->TASKS_STOP     = 1;
+			NRF_ADC->ENABLE     = ADC_ENABLE_ENABLE_Disabled;
+			sd_clock_hfclk_release();
 
 
 }
