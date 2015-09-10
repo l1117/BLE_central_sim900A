@@ -318,8 +318,8 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 	//							simple_uart_put( p_ble_evt->evt.gap_evt.params.adv_report.data[i]);
 								}
 						  tx_data[0] = p_ble_evt->evt.gap_evt.params.adv_report.rssi;
-							*(uint32_t *)(tx_data + 16) = timer_counter - *(uint32_t *)(tx_data + 8 );
-																												   //			 +  *(uint32_t *)(tx_data + 12 );
+							*(uint32_t *)(tx_data + 12) += timer_counter - *(uint32_t *)(tx_data + 8 );
+//																												 	 +  *(uint32_t *)(tx_data + 12 );
 							*(uint32_t *)(tx_data + 8) = timer_counter; //- *(uint32_t *)(tx_data + 8 )
 																												   //			 +  *(uint32_t *)(tx_data + 12 );
 //							for (uint8_t i = 0 ; i <32 ; i++) simple_uart_put( tx_data[i]);
@@ -331,15 +331,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 									pstorage_block_id++;
 									app_timer_stop(weakup_meantimer_id);
 									app_timer_start(weakup_meantimer_id,  APP_TIMER_TICKS(2000, 0), NULL);
-									if (pstorage_block_id < (PSTORAGE_MAX_APPLICATIONS*32)) {
-												if ((time_period_count >= 1800) && (pstorage_block_id > (PSTORAGE_MAX_APPLICATIONS*32/2)))	{
-															weakup_flag = true ;
-			//												time_period_count = 0;
-												}
-											}
-									else 	{	
+									if (pstorage_block_id >= (PSTORAGE_MAX_APPLICATIONS*32)) {
 												sd_ble_gap_scan_stop();
 												scan_start = false;
+										    weakup_flag = true;
 									}
 								}
 					break;
@@ -415,6 +410,10 @@ static void weakup_timeout_handler(void * p_context)
 		uint32_t err_code;
 		timer_counter += TIME_PERIOD ;
 		time_period_count += TIME_PERIOD;
+			if ((time_period_count >= 3600) )	{
+					weakup_flag = true ;
+		}
+
 		if (weakup_flag) return;
 
 //		memset(tx_data,0,MAX_rx_count);
@@ -506,13 +505,14 @@ int main(void)
 //							err_code = pstorage_store(&flash_base_handle, (uint8_t * )&tx_data, PSTORAGE_BLOCK_SIZE , 0);
 //							APP_ERROR_CHECK(err_code);
 		pstorage_handle_t 		flash_handle;
-		for (pstorage_block_id = 0; pstorage_block_id < param.block_count; pstorage_block_id++){
-					err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id , &flash_handle);
+		for (pstorage_block_id = param.block_count  ; pstorage_block_id > 0 ; pstorage_block_id--){
+					err_code = pstorage_block_identifier_get(&flash_base_handle, pstorage_block_id -1 , &flash_handle);
 					APP_ERROR_CHECK(err_code);
 					err_code = pstorage_load(tx_data, &flash_handle, 32 , 0);
 					APP_ERROR_CHECK(err_code);
-					if (*(uint64_t * )(tx_data) == 0xffffffffffffffff) break;
+					if (*(uint64_t * )(tx_data) != 0xffffffffffffffff) break;
 		}
+		
 		NRF_GPIO->PIN_CNF[GTM900_power_pin] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
 																							| (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
 																							| (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
@@ -527,7 +527,7 @@ int main(void)
 		err_code = app_timer_start(weakup_timer_id,  APP_TIMER_TICKS(1000, 0), NULL) ;
 		APP_ERROR_CHECK(err_code);
 		weakup_flag=1;
-		while ((timer_counter < 0x01200000) || pstorage_block_id) {
+		while ((timer_counter < 0x01200000) || (pstorage_block_id)) {
 					nrf_gpio_pin_clear(GTM900_power_pin);
 					nrf_delay_ms(10000);
 					nrf_gpio_pin_set(GTM900_power_pin);
@@ -548,18 +548,22 @@ int main(void)
 					NRF_UART0->POWER = (UART_POWER_POWER_Disabled << UART_POWER_POWER_Pos);
 		} 
 	weakup_flag = 0;
-	flash_handle = flash_base_handle;
-	for (uint8_t i = 0; i < PSTORAGE_MAX_APPLICATIONS; i ++)  {
-				err_code = pstorage_clear(&flash_handle, PSTORAGE_BLOCK_SIZE );
-				APP_ERROR_CHECK(err_code);
-				nrf_delay_ms(20);
-//				err_code = sd_app_evt_wait();
-//				APP_ERROR_CHECK(err_code);    
-				flash_handle.block_id += 1024;
-	}
+//	flash_handle = flash_base_handle;
+//	for (uint8_t i = 0; i < PSTORAGE_MAX_APPLICATIONS; i ++)  {
+//				err_code = pstorage_clear(&flash_handle, PSTORAGE_BLOCK_SIZE );
+//				APP_ERROR_CHECK(err_code);
+//				nrf_delay_ms(20);
+////				err_code = sd_app_evt_wait();
+////				APP_ERROR_CHECK(err_code);    
+//				flash_handle.block_id += 1024;
+//	}
 		for (;;)
 			{
 				if (weakup_flag){
+		        if (scan_start) {
+								sd_ble_gap_scan_stop();
+								scan_start = false;
+						}
 						time_period_count = 0;
 						nrf_gpio_pin_clear(GTM900_power_pin);
 						nrf_delay_ms(100);
